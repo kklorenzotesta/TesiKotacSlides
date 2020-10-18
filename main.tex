@@ -5,7 +5,11 @@
 \begin{frame}
 \frametitle{Distributed systems}
 \begin{block}{Why distributed systems}
-Number, pervasiveness and variety of interconnected devices, forming the \textit{Internet of Things (IOT)}, is constantly increasing. New distributed application can be built thanks to this network, like crowd managment or data summarisation.
+\begin{itemize}
+\item \textit{Internet of Things (IOT)}
+\item \textit{Edge computing}
+\item New distributed applications
+\end{itemize}
 \end{block}
 \begin{block}{Distributed systems challenges}
 \begin{itemize}
@@ -18,7 +22,7 @@ Number, pervasiveness and variety of interconnected devices, forming the \textit
 \end{frame}
 
 \begin{frame}
-\frametitle{Aggregate programming}
+\frametitle{Aggregate programming \small [Beal, J. Pianini, D. Viroli, M. (2015)]}
 \begin{block}{Why aggregate programming}
 \begin{itemize}
 \item multi-platform framework
@@ -33,14 +37,14 @@ Number, pervasiveness and variety of interconnected devices, forming the \textit
 
 \begin{frame}
 \centering
-\frametitle{Aggregate programming layers}
+\frametitle{Aggregate programming layers \small [Beal, J. Pianini, D. Viroli, M. (2015)]}
 \includegraphics[height=7cm]{imgs/layers.pdf}
 \end{frame}
 
 \begin{frame}
-\frametitle{Field Calculus}
+\frametitle{Field Calculus \small [Viroli, M. Audrito, G. Damiani, F. et al. (2016)]}
 \begin{block}{}
-Formal language and model for studying algorithms and properties based on the notion of \textit{computational fields}.
+Formal language and model based on \textit{computational fields}.
 
 Network of devices executing a common program in asyncronous rounds.
 \end{block}
@@ -51,13 +55,13 @@ Network of devices executing a common program in asyncronous rounds.
                 \PROGRAM & \BNFcce & \overline{\FUNCTION}  \; \e
                 &{ \mbox{\footnotesize program}}
                 \\[3pt]
-                \FUNCTION & \BNFcce &  \defK \,\; \fname (\overline{\xname}) \; \{ \e \}
+                \FUNCTION & \BNFcce &  {\color{blue} \defK} \,\; \fname (\overline{\xname}) \; \{ \e \}
                 &{ \mbox{\footnotesize function declaration}}
                 \\[3pt]
                 \e & \BNFcce &  \xname \;\BNFmid\; \anyvalue \;\BNFmid\;  (\overline{\xname}) \toSym{\name} \e \; \BNFmid \; \e(\overline\e) \;\BNFmid\;  &{ \mbox{\footnotesize expression}} \\
-&& \fifK (\e) \{\e\} \elseK \{\e\} \;\BNFmid \; \\
-                && \nbrK\{\e\} \;\BNFmid\; \repK(\e)\{ (\xname) \ftoSym \e \} \; \BNFmid \; \\
-                && \shareK(\e)\{(\xname) \ftoSym \e \}
+&& {\color{red} \fifK} (\e) \{\e\} {\color{red} \elseK} \{\e\} \;\BNFmid \; \\
+                && {\color{red} \nbrK}\{\e\} \;\BNFmid\; {\color{red} \repK}(\e)\{ (\xname) \ftoSym \e \} \; \BNFmid \; \\
+                && {\color{red} \shareK}(\e)\{(\xname) \ftoSym \e \}
                 \\[3pt]
                 \anyvalue & \BNFcce &  \lvalue \; \BNFmid \; \fvalue
                 &{ \mbox{\footnotesize value}}
@@ -79,7 +83,7 @@ Network of devices executing a common program in asyncronous rounds.
 
 
 \begin{frame}[fragile]
-\frametitle{Field Calculus}
+\frametitle{Field Calculus \small [Viroli, M. Audrito, G. Damiani, F. et al. (2016)]}
 	\begin{block}{Example}
 \begin{lstlisting}[]
 def distanceTo(source) {
@@ -89,36 +93,92 @@ def distanceTo(source) {
 }
 \end{lstlisting}
 \end{block}
+\medskip
+\includegraphics[width=0.65\linewidth]{imgs/gradient.pdf}
+\includegraphics[width=0.3\linewidth]{imgs/valuetree.pdf}
 \end{frame}
 
 \begin{frame}
 \frametitle{Goals and contributions}
-\begin{block}{}
+\begin{block}{Goal}
+Library for aggregate programming in Kotlin (\Kotac{})
+\end{block}
+\begin{block}{Contributions}
 \begin{itemize}
-\item Overview of existing frameworks
 \item \Kotac{} framework API and partial implementation
-\item \FKotac{} semantics and typing formalization
+\item Semantics and typing formalization (\FKotac{})
 \end{itemize}
 \end{block}
 \end{frame}
 
-\begin{frame}
+\begin{frame}[fragile]
 \frametitle{Existing aggregate frameworks}
-\begin{block}{Protelis}
+\begin{block}{Protelis \small [Pianini, D. Montagna, S. Viroli, M. (2013)]}
+\begin{multicols}{2}
+{Features:
 \begin{itemize}
-\item External DSL
 \item Java interoperability
 \item Rich standard library
 \item Simulation with Alchemist
 \end{itemize}
+}
+{Limitations:
+\begin{itemize}
+\item External DSL
+\item No typing
+\item[\vspace{\fill}]
+\end{itemize}
+}
+\end{multicols}
 \end{block}
-\begin{block}{\Scafi}
+\begin{block}{Protelis example}
+\begin{lstlisting}[language={Protelis}]
+def distanceTo(source) {
+  rep (POSITIVE_INFINITY) { (d) =>
+     mux (source) {
+        0
+     } else { 
+        minHood(nbr(d) + nbrRange.apply())
+    }
+  }
+}
+\end{lstlisting}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Existing aggregate frameworks}
+\begin{block}{\Scafi [Casadei, R. (2020)]}
+\begin{multicols}{2}
+{Features:
 \begin{itemize}
 \item Internal DSL in Scala
 \item Expressive type-safe API
-\item Computation against a neighbour
 \item Akka integration
 \end{itemize}
+}
+{Limitations:
+\begin{itemize}
+\item No field calculus semantics
+\item Computation against a neighbour
+\end{itemize}
+}
+\end{multicols}
+\end{block}
+\begin{block}{\Scafi example}
+\begin{lstlisting}[language={scafi}]
+def distanceTo(source: Boolean): Double {
+  rep (Double.PositiveInfinity) { distance =>
+     mux (source) {
+        0.0
+     }{
+        foldhood(Double.PositiveInfinity)(Math.min(_,_)){ 
+          nbr{distance} /*: Double */  + nbrRange /*: Double */
+        } /*: Double */
+    }
+  }
+}
+\end{lstlisting}
 \end{block}
 \end{frame}
 
@@ -150,17 +210,21 @@ interface AggregateContext {
 \frametitle{\Kotac}
 \begin{block}{Example}
 \begin{lstlisting}[language={kotac}]
-fun AggregateContext.gossipMin(value: Int): Int = share(value) { f ->
-	Math.min(f.min(), value)
-}
+fun AggregateContext.distanceTo(source: Boolean): Double =
+  rep(Double.POSITIVE_INFINITY) { distance ->
+    mux(source, 0.0, 
+      (nbr { distance } /*: Field<Double> */ + 
+        nbrRange /* Field<Double> */).min() /*: Double */
+    )
+  }
 \end{lstlisting}
 \end{block}
 \end{frame}
 
 \begin{frame}
 \frametitle{\FKotac}
-\begin{block}{}
-\FKotac{} is a subset of the \Kotac{} DSL used in order to formalize syntax, semantics and typing.
+\begin{block}{\FKotac}
+Subset of the \Kotac{} DSL used in order to formalize syntax, semantics and typing.
 
 Both aggregate function and Kotlin function have been formalized.
 \end{block}
