@@ -1,0 +1,236 @@
+Since Scafi is based on the notion of computations against a neighbour instead of neighbouring values it has different semantics from the higher order field calculus (\HFC) and its implementation Protelis. In order to formalize the semantic of Scafi a subset of it has been considered called \textit{Featherweight Scafi (\FSCAFI)} \cite{Scafi} and only the semantic of \FSCAFI has been considered. It has been proved that both \FSCAFI and \HFC{} can express programs that the other can't, but they have a non-empty intersection that can express all the self-stabilising build blocks.
+
+\begin{figure}[t]
+\centering
+\centerline{\framebox[\textwidth]{$
+\begin{array}{l@{\hspace{1mm}}c@{\hspace{1mm}}l@{\hspace{-8mm}}r}
+        \PROGRAM & \BNFcce & \overline{\FUNCTION}  \; \e
+                                                                                                                                                                                                        &   {\footnotesize \mbox{program}} \\[3pt]
+        \FUNCTION & \BNFcce &  \defK \; \fname (\overline{\xname}) \; \eqSymK{\e}
+                                                                                                                                                                                                        &   {\footnotesize \mbox{function declaration}} \\[3pt]
+        \e & \BNFcce & \xname \, \BNFmid \, \anyvalue \, \BNFmid \, \e(\overline{\e}) \, \BNFmid \, \repK(\e)\{ \e \} \, \BNFmid \, \nbrK\{\e\} \, \BNFmid \, \foldK(\e)(\e)\{\e\} \,
+                                                                                                                                                                                                        &   {\footnotesize \mbox{expression}} \\[3pt]
+        \hline \\[-6pt]
+        \anyvalue & \BNFcce &  {\dc(\overline{\anyvalue})} \; \BNFmid \; \funvalue
+                                                                                                                                                                                                        &   {\footnotesize\mbox{value}} \\
+        \funvalue & \BNFcce & \bname \; \BNFmid \; \fname \; \BNFmid \; (\overline{\xname}) \; \toSymKtag{\name}{\e}
+                                                                                                                                                                                                        &   {\footnotesize\mbox{function value}} \\
+\end{array}
+$}
+}
+\caption{Syntax of \FSCAFI{} from \cite{Scafi}}
+\label{fig:fscafisyntax}
+\end{figure}
+
+The syntax of \FSCAFI is shown in figure \ref{fig:fscafisyntax}, it focus on the aggregate constructs ignoring the Scala specific features. A program $\PROGRAM$ is defined as a sequence of function declarations $\overline{\FUNCTION}$ followed by a main expression $\e$. A function declaration $\FUNCTION$ defines a (possibly recursive) function named $\fname$, with a sequence of formal parameters $\overline{\xname}$ and a body expression $\e$. An expression can be a variable $\xname$, a value $\anyvalue$, a $\mathtt{rep}$-expression $\repK(\e)\{ \e \}$ modelling time evolution, a $\mathtt{nbr}$-expression $\nbrK\{\e\}$ modelling neighbourhood interaction or a $\mathtt{foldhood}$-expression $\foldK(\e)(\e)\{\e\}$ combaining a computation against neighbours.
+
+A value can be either a \textit{data value} $\dc(\overline{\anyvalue})$ consisting of a \textit{data constructor} $\dc$ applied to a sequence of values $\overline{\anyvalue}$, or a \textit{function value} $\funvalue$. A function value can be the name of a built-in function $\bname$, the name of a user defined function $\fname$, or an anonymous function $(\overline{\xname}) \; \toSymKtag{\name}{\e}$ where $\overline{\xname}$ are the formal parameters, $\e$ the body of the function and $\name$ a \textit{tag} that uniquely identifies the function and doesn't occours in the source program.
+
+\begin{figure}[!t]{
+ \framebox[1\textwidth]{
+ $\begin{array}{l}
+\textbf{Value-trees  
+and value-tree environments:}\\
+\begin{array}{rcl@{\hspace{8.1cm}}r}
+	\vtree & \BNFcce &  \mkvtree{E-Rule}{\anyvalue}{\overline{\vtree}}   
+	&   {\footnotesize \mbox{value-tree}} \\
+	\Trees & \BNFcce & \envmap{\overline{\deviceId}}{\overline{\vtree}} 
+	 &   {\footnotesize \mbox{value-tree environment}} \\
+\end{array}\\
+\hline\\[-8pt]
+\textbf{Auxiliary functions:}\\
+\begin{array}{l}
+\begin{array}{l@{\hspace{8pt}}l@{\hspace{8pt}}l}
+	\nameOf((\overline{\xname}) \; \toSymKtag{\name}{\e}) = \name
+	&
+	\args{ (\overline{\xname}) \; \toSymKtag{\name}{\e}} = \overline{\xname}
+	&
+	\body{(\overline{\xname}) \; \toSymKtag{\name}{\e}} = \e
+	\\
+	\nameOf(\fname) = \fname
+	&
+	\args{\fname} = \overline{\xname}
+	&
+	\body{\fname} = \e  \; (\text{if } \, \defK \; \fname (\overline{\xname}) \; \eqSymK{\e})
+	\\
+	\nameOf(\bname) = \bname
+	&
+	\vrootOf{\mkvtree{}{\anyvalue}{\overline{\vtree}}}  =   \anyvalue
+	\\
+	\piIof{i}{\mkvtree{E-Rule}{\anyvalue}{\vtree_1,\ldots,\vtree_n}}  =  \vtree_i
+	&
+	\text{if~} 1\le i \le n
+	&
+	\text{~else~} \emptyseq
+	\\
+	\piBof{\funvalue}{\mkvtree{E-Rule}{\anyvalue}{\vtree_1,\ldots,\vtree_{n+2}}}  =   \vtree_{n+2}
+	&
+	\text{if~} \nameOf(\vrootOf{\vtree_{1}}) = \nameOf(\funvalue)
+	&
+	\text{~else~} \emptyseq
+\end{array} \!\!\!\!\!\!\!\!\!\!\!\!\!\!\!
+\\[30pt]
+\mbox{For } \auxNAME\in\rho,\piI{i},\piB{\funvalue}:
+\quad 
+\left\{{\begin{array}{lcll}
+	 \aux{\emptyseq}  & =  & \emptyseq
+	\\
+	\aux{\envmap{\deviceId}{\vtree}, \Trees}  & =   & \aux{\Trees}  & \quad \mbox{if} \; \aux{\vtree}=\emptyseq  
+	\\
+	 \aux{\envmap{\deviceId}{\vtree}, \Trees}  & =  & \envmap{\deviceId}{\aux{\vtree}}, \aux{\Trees} & \quad \mbox{if} \; \aux{\vtree} \not=\emptyseq  
+\end{array}}\right.   \!\!\!\!\!\!
+\end{array}\\
+\hline\\[-10pt]
+\textbf{Syntactic shorthands:}\\
+\begin{array}{l@{\hspace{11pt}}l@{\hspace{11pt}}l}
+\bsopsem{\deviceId,\deviceId'}{\piIofOv{\Trees}}{\senstate}{\overline{\e}}{\overline{\vtree}}
+&
+  \textrm{where~~} |\overline{\e}|=n
+&
+  \textrm{for~~}
+  \bsopsem{\deviceId,\deviceId'}{\piIof{1}{\Trees}}{\senstate}{\e_1}{\vtree_1}
+    \cdots
+    \bsopsem{\deviceId,\deviceId'}{\piIof{n}{\Trees}}{\senstate}{\e_n}{\vtree_n} \!\!\!\!\!\!\!\!\!\!\!\! \\
+\vrootOf{\overline{\vtree}}
+&
+  \textrm{where~~} |\overline{\vtree}|=n
+  & \textrm{for~~}
+\vrootOf{\vtree_1},\ldots,\vrootOf{\vtree_n}\\
+\substitution{\overline{\xname}}{\vrootOf{\overline{\vtree}}}
+&   \textrm{where~~} |\overline{\xname}|=n
+  &
+  \textrm{for~~}
+\substitution{\xname_1}{\vrootOf{\vtree_1}}~\ldots\quad\substitution{\xname_n}{\vrootOf{\vtree_n}}
+\end{array}\\
+\hline\\[-10pt]
+\textbf{Rules for expression evaluation:} \hfill
+ \boxed{\bsopsem{\deviceId,\deviceId'}{\Trees}{\senstate}{\e}{\vtree}}
+%
+\skiptransitionR
+%
+\begin{array}{c}
+\nullsurfaceTyping{E-VAL}{
+\bsopsem{\deviceId,\deviceId'}{\Trees}{\senstate}{\anyvalue}{\mkvtree{}{\anyvalue}{}}
+}
+%
+\skiptransitionN\\
+%
+\surfaceTyping{E-B-APP}{
+\begin{array}{ll}
+  \bsopsem{\deviceId,\deviceId}{\piIof{1}{\Trees}}{\senstate}{\e}{\vtree} 
+                    &
+          \bsopsem{\deviceId,\deviceId'}{\piIof{i+1}{\Trees}}{\senstate}{\e_i}{\vtree_i}  \quad \text{for all}\; i \in 1, \ldots, n
+      \\
+         \anyvalue=\builtinop{\bname}{\deviceId,\deviceId'}{\piBof{\bname}{\Trees},\senstate}(\vrootOf{\overline{\vtree}})
+         &
+         (\bname = \vrootOf{\vtree} \text{ is not relational }) \vee (\deviceId' \in \domof{\piBof{\bname}{\Trees}} \cup \{\deviceId\})
+\end{array} \!\!\!\!
+ }{
+\bsopsem{\deviceId,\deviceId'}{\Trees}{\senstate}{\e(\overline{\e})}{\mkvtree{}{\anyvalue}{\vtree,\overline{\vtree},\anyvalue}}
+}
+%
+\skiptransitionN\\
+%
+\surfaceTyping{E-D-APP}{
+\begin{array}{ll}
+  \bsopsem{\deviceId,\deviceId}{\piIof{1}{\Trees}}{\senstate}{\e}{\vtree} 
+& 
+\bsopsem{\deviceId,\deviceId'}{\piIof{i+1}{\Trees}}{\senstate}{\e_i}{\vtree_i} \quad \text{for all}\; i \in 1, \ldots, n
+ 
+\\
+  \funvalue = \vrootOf{\vtree} \mbox{ is not a built-in}
+ & 
+  \bsopsem{\deviceId,\deviceId'}{\piBof{\funvalue}{\Trees}}{\senstate}{\applySubstitution{\body{\funvalue}}{\substitution{\args{\funvalue}}{\vrootOf{\overline{\vtree}}}}}{\vtree'}
+\end{array} \!\!\!\!
+ }{
+\bsopsem{\deviceId,\deviceId'}{\Trees}{\senstate}{\e(\overline{\e})}{\mkvtree{}{\vrootOf{\vtree'}}{\vtree,\overline{\vtree},\vtree'}}
+}
+%
+\skiptransitionN\\
+%
+\surfaceTyping{E-REP}{
+        \begin{array}{ll}
+     \bsopsem{\deviceId,\deviceId}{\piIof{1}{\Trees}}{\senstate}{\e_1}{\vtree_1} & \anyvalue_1=\vrootOf{\vtree_{1}}\\
+     \bsopsem{\deviceId,\deviceId}{\piIof{2}{\Trees}}{\senstate}{\e_2(\anyvalue_0)}{\vtree_2}~~& \anyvalue_2=\vrootOf{\vtree_{2}}
+        \end{array}
+        \quad
+        \anyvalue_0 = \left\{\begin{array}{ll}
+                             \vrootOf{\piIof{2}{\Trees}}(\deviceId) & \mbox{if} \;  \deviceId \in \domof{\Trees} \\
+                             \anyvalue_1 & \mbox{otherwise}
+                           \end{array}\right.
+ }{
+\bsopsem{\deviceId,\deviceId'}{\Trees}{\senstate}{\repK(\e_1)\{\e_2\}}{\mkvtree{}{\anyvalue_2}{\vtree_1,\vtree_2}}
+}
+%
+\skiptransitionN\\
+%
+\surfaceTyping{E-NBR}{
+         \quad
+        \deviceId \neq \deviceId' \in \domof{\Trees}
+\qquad
+        \vtree = \Trees(\deviceId')
+ }{
+\bsopsem{\deviceId,\deviceId'}{\Trees}{\senstate}{\nbrK\{\e\}}{\vtree}
+}
+\qquad
+\surfaceTyping{E-NBR-LOC}{
+         \quad
+     \bsopsem{\deviceId,\deviceId}{\piIof{1}{\Trees}}{\senstate}{\e}{\vtree}
+ }{
+\bsopsem{\deviceId,\deviceId}{\Trees}{\senstate}{\nbrK\{\e\}}{\mkvtree{}{\vrootOf{\vtree}}{\vtree}}
+}
+%
+\skiptransitionN\\
+%
+\surfaceTyping{E-FOLD}{
+        \begin{array}{ll}
+                \bsopsem{\deviceId,\deviceId}{\piIof{1}{\Trees}}{\senstate}{\e_1}{\vtree^1}
+                &
+                 \quad
+               \bsopsem{\deviceId,\deviceId}{\piIof{2}{\Trees}}{\senstate}{\e_2}{\vtree_0}
+                  \qquad
+               \funvalue = \vrootOf{\vtree_0}
+                 \\
+                 \deviceId_1,...\deviceId_n = \domof{\Trees}\cup\{\deviceId\} 
+               &
+               \quad
+               n\ge m\ge 1
+                \qquad \deviceId_1 = \deviceId
+                \\
+                 \bsopsem{\deviceId,\deviceId_i}{\piIof{3}{\Trees}}{\senstate}{\e_3}{\vtree_i}
+                &
+                \quad
+               \text{for all } i \in 1,...,m 
+                \\
+                \bsopsemFAIL{\deviceId,\deviceId_j}{\piIof{3}{\Trees}}{\senstate}{\e_3}{}
+                &
+                 \quad
+               \text{for all } j \in m+1,...,n 
+                \\
+                  \bsopsem{\deviceId,\deviceId}{\emptyset}{\senstate}{\funvalue(\vrootOf{\vtree^i}, \vrootOf{\vtree_i})}{\vtree^{i+1}}
+                &
+                \quad
+                \text{for all } i \in 1,...,m
+        \end{array}
+ }{
+\bsopsem{\deviceId,\deviceId'}{\Trees}{\senstate}{\foldK(\e_1)(\e_2)\{\e_3\}}{\mkvtree{}{\vrootOf{\vtree^{m+1}}}{\vtree^1, \vtree_0, \vtree_1}}
+}
+\end{array}
+\end{array}$}
+} 
+\vspace{-0.1cm}
+ \caption{Big-step operational semantics for expression evaluation from \cite{Scafi}.} \label{fig:fscafisemantics}
+\end{figure}
+
+
+The semantics of \FSCAFI is shown in figure \ref{fig:fscafisemantics}. Like the field calculus sematic it follows the same notation and the result of the execution is a value-tree. It also uses the same ausiliary functions. Unlike the field calculus semantics the expression are evaluated against an additional deviced id $\deviceId'$ which is used by the $\mathtt{foldhood}$-expressions to evaluate against a neighbour.
+
+Rule \ruleNameSize{[E-VAL]} defines the evaluation of a value which produce a simple value-tree with only that value.
+
+Rules \ruleNameSize{[E-B-APP]} and \ruleNameSize{[E-D-APP]} model the application of built-in and user-defined (or anonymous) functions. Like for the field calculus semantic the built-ins evaluation is delegated a specific ausiliary functions different for each built-in that may depend on the neighbour device against which the computation is currently happening. In case of user-defined functions the domain of aligned neighbours is restricted to only the ones that executed the same function thanks to the operator $\piBof{\funvalue}{\Trees}$.
+
+Rule \ruleNameSize{[E-REP]}  models the evaluation of $\mathtt{rep}$-expressions just like the field calculus semantic.
+
+Rules \ruleNameSize{[E-NBR]} and \ruleNameSize{[E-NBR-LOC]} both models the evaluation of $\mathtt{nbr}$-expressions, the former in the case that the computation is currently happening against a neightbour, the latter in case is happening against the executing device. In the first case the computed value is read from the value-tree environment, in the second case is computed recursively.
+
+Rule \ruleNameSize{[E-FOLD]} models the evaluation of $\mathtt{foldhood}$-expressions. The expression $\e_3$ is computed against the executing device and against each network and the computed values are combined with the $\e_2$ function with an empty value-tree environment.

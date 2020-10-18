@@ -1,0 +1,73 @@
+Protelis \cite{Protelis} is a Domain Specific Language providing a practical implementation of the aggregate programming paradigm. It runs on the Java Virtual Machine (JVM) and provides full interoperability with the Java type-system and API. The text Protelis programs are translated into a valid representation of the higher order field calculus semantics, then this representation is executed at regular intervals by the Protelis interpreter. Protelis abstracts over the device capabilities and communication system, allowing to use it for both simulations (like the Alchemist simulator \cite{Alchemist}) and real world application. Protelis also provides a rich standard library for the application developers.
+
+\begin{figure}[t]
+\centering
+\centerline{\framebox[\linewidth]{$
+        \begin{array}{lcl@{\hspace{18mm}}r}
+                \PROGRAM & \BNFcce & \overline{\IMPORT} \; \overline{\FUNCTION}  \; \overline{\mathtt{s}};
+                &{ \mbox{\footnotesize Program}}
+                \\[3pt]
+                \IMPORT & \BNFcce & \mathtt{import} \; \iname \;  \BNFmid \; \mathtt{import \; m.*} 
+                &{ \mbox{\footnotesize Java import}}
+                \\[3pt]
+                \FUNCTION & \BNFcce &  \defK \,\; \mathtt{f} (\overline{\xname}) \; \{ \overline{\mathtt{s}} \}
+                &{ \mbox{\footnotesize Function definition}}
+                \\[3pt]
+                \mathtt{s} & \BNFcce &  \e \;\BNFmid\; \mathtt{let} \; \xname \; = \; \e \;\BNFmid \; \xname \; = \; \e
+                &{ \mbox{\footnotesize Statement}}
+                \\[3pt]
+                \mathtt{w} & \BNFcce &  \xname \;\BNFmid\; \mathtt{l} \; \BNFmid \; [\overline{\mathtt{w}}] \;\BNFmid \; \mathtt{f} \; \BNFmid \; (\overline{\xname}) \texttt{->} \{ \; \overline{\mathtt{s}};\}
+                &{ \mbox{\footnotesize Variable/Value}}
+                \\[3pt]
+                \e & \BNFcce &  \mathtt{w} \; \BNFmid \; &{ \mbox{\footnotesize Expression}} \\
+	     && \mathtt{b}(\overline{\e}) \; \BNFmid\; \mathtt{f}(\overline{\e}) \;\BNFmid\; \e.\mathtt{apply}(\overline{\e}) \;\BNFmid &{ \mbox{\footnotesize Fun/Op Calls}} \\
+                && \e.\mathtt{m}(\overline{\e}) \;\BNFmid\; \texttt{\#}\mathtt{a}(\overline{\e})  \;\BNFmid &{ \mbox{\footnotesize Method Calls}} \\
+                && \repK(\xname\texttt{<-}\mathtt{w})\{ \overline{\mathtt{s}};\}  \;\BNFmid &{ \mbox{\footnotesize Persistent state}} \\
+                && \mathtt{if}(\e)\{\overline{\mathtt{s}};\}\mathtt{else}\{\overline{\mathtt{s}}';\}  \;\BNFmid &{ \mbox{\footnotesize Exclusive branch}} \\
+                && \mathtt{mux}(\e)\{\overline{\mathtt{s}};\}\mathtt{else}\{\overline{\mathtt{s}}';\} \; \BNFmid &{ \mbox{\footnotesize Inclusive branch}} \\
+                && \nbrK\{\overline{\mathtt{s}}';\} &{ \mbox{\footnotesize Neighbourhood values}}
+                \\[3pt]
+        \end{array}
+        $}
+}
+\caption{Abstract syntax of the Protelis language from \cite{Protelis}} \label{fig:protelissyntax}
+\end{figure}
+
+Figure \ref{fig:protelissyntax} shows the abstract syntax of the Protelis syntax. A Protelis program is composed by a sequence of Java imports, followed by a sequence of function declarations and a sequence of statements composing the main code. Each import specifies the package (if any) and the method name. Each function definition declares a function named $\mathtt{f}$ with a sequence of variables named $\overline{\xname}$ and the body composed by a sequence of statements $\overline{\mathtt{s}}$. The result of a sequence of statements is always considered the value of the last statement of the sequence.
+
+
+A statement can be an expressions $\e$, a local variable declaration in the form $\mathtt{let} \; \xname \; = \; \e$ where $\xname$ is the new variable name and $\e$ is the expression computing the initial value of the variable, or a re-assignment of a new value to a variable in the form $\xname \; = \; \e$ where $\xname$ is the name of an existing variable and $\e$ is the expression computing the new value.
+
+A value can be a variable name $\xname$, a literal value $\mathtt{l}$ (Boolean, numerical, string), a tuple of values in the form $[\overline{\mathtt{w}}]$, a function name $\mathtt{f}$ or a lambda (i.e. an anonymous function) in the form $ (\overline{\xname}) \texttt{->} \{ \; \overline{\mathtt{s}};\}$ where $\overline{\xname}$ are the arguments and the body is a sequence of statements $\overline{\mathtt{s}}$.
+
+Finally an expression can be:
+\begin{itemize}
+\item a value $\mathtt{w}$
+\item a function call with the arguments $\overline{\e}$, the function can be either a built-in function $\mathtt{b}$\footnote{some built-in function can be called with an infix-style but the syntax has been omitted for simplicity}, a user defined function $\mathtt{f}$ or the application of the argument to a lambda or function name resulting from the evaluation of $\e$
+\item a Java method call with the arguments $\overline{\e}$, it can be called either a method $\mathtt{m}$ on an object computed by $\e$ or a static method via an alias $\#\mathtt{a}$. The aliases are created automatically from the imports.
+\item a $\mathtt{rep}$-construct $\repK(\xname\texttt{<-}\mathtt{w})\{ \overline{\mathtt{s}};\}$, equivalent to the field calculus $\mathtt{rep}$, declaring a variable $\xname$ inizialized at $\mathtt{w}$ and updated each round with the result of the execution of the body $\overline{\mathtt{s}}$
+\item an $\mathtt{if}$-construct $\mathtt{if}(\e)\{\overline{\mathtt{s}};\}\mathtt{else}\{\overline{\mathtt{s}}';\}$, equivalent to the field calculus $\mathtt{if}$, execution only $\overline{\mathtt{s}}$ or $\overline{\mathtt{s}}'$ according to the branching condition computed by $\e$
+\item a $\mathtt{mux}$-construct $\mathtt{mux}(\e)\{\overline{\mathtt{s}};\}\mathtt{else}\{\overline{\mathtt{s}}';\}$, computing both branches $\overline{\mathtt{s}}$ and $\overline{\mathtt{s}}'$ and return the value of one of them accourding to the branching condition computed by $\e$
+\item a $\mathtt{nbr}$-construct $\nbrK\{\overline{\mathtt{s}}';\}$, equivalent to the field calculus $\mathtt{nbr}$, returning a field from all neighbors to their last value from computing $\overline{\mathtt{s}}$.
+\end{itemize}
+
+\begin{figure}[t]
+\begin{lstlisting}[language={Protelis},frame=single,
+  emph={count, maxh, distanceTo, distanceToWithObstacle}
+]
+def count() { rep(x <- 0){ x + 1 } }
+def maxh(field) { maxHood(nbr{field}) }
+def distanceTo(source) {
+  rep(d <- Infinity) {
+    mux (source) { 0 }
+    else { minHood(nbr{d} + nbrRange) }
+  }
+}
+def distanceToWithObstacle(source, obstacle) {
+  if (obstacle) { Infinity } else { distanceTo(source) }
+}
+\end{lstlisting}
+\caption{Examples of Protelis code from \cite{Protelis}}\label{fig:protelisexample}
+\end{figure}
+
+Figure \ref{fig:protelisexample} shows an example of Protelis code. The function $\mathtt{count}$ yields the number of round that have been executed. The function $\mathtt{maxh}$ yield a the maximum value of $\mathtt{field}$ across all neighbours using the built-in function $\mathtt{maxHood}$, which takes a field as argument an returns the maximum value. Its important to note that the only way to extract a regular value from a field in Protelis is to use one of the many built-in "hood" functions. The function $\mathtt{distanceTo}$ computes the distance from the device to the nearest device where $\mathtt{source}$ holds $\mathtt{True}$, each device starts with an infinite distance and each round returns zero if it is a source otherwise returns the minimum of the distances shared by the neightbours summed to the distance to that neighbour. It uses the built-in functions $\mathtt{minHood}$ and $\mathtt{nbrRange}$, the former returning the minimum value in the field and the latter returning a field of the distances to each neightbour. The last function $\mathtt{distanceToWithObstacle}$ splits the network in two sub-regions, the normal nodes simply computes the function $\mathtt{distanceTo}$ while the nodes where obstacle holds $\mathtt{True}$ don't partecipate in the algorithm and return an infinite distance.

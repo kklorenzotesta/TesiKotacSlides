@@ -1,0 +1,395 @@
+% % % % % % % % % % % % % % % % % % % %
+% COOPERATION
+
+\newcommand{\DoneByGA}[1]{\textcolor{OliveGreen}{ #1}}
+\newcommand{\GAcomment}[1]{{\DoneByGA{GIORGIO SAYS:#1}}}
+\newcommand{\GAmarg}[1]{\todo{\textcolor{green}{#1}}}
+
+\newcommand{\DoneByFD}[1]{\textcolor{magenta}{#1}}
+\newcommand{\FDcomment}[1]{{\DoneByFD{FERRUCCIO SAYS:#1}}}
+\newcommand{\FDmarg}[1]{\todo{\textcolor{magenta}{#1}}}
+\newcommand{\FDdel}[1]{\textcolor{magenta}{\sout{#1}}}
+\newcommand{\FDadd}[1]{{\color{magenta}{#1}}}
+
+\newcommand{\DoneByMV}[1]{\textcolor{blue}{ #1}}
+\newcommand{\MVcomment}[1]{{\DoneByMV{MIRKO SAYS:#1}}}
+\newcommand{\MVmarg}[1]{\todo{\textcolor{blue}{#1}}}
+\newcommand{\MVdel}[1]{\textcolor{blue}{\sout{#1}}}
+\newcommand{\MVadd}[1]{{\textcolor{blue}{#1}}}
+
+\newcommand{\JBmarg}[1]{\todo{\textcolor{red}{#1}}}
+\newcommand{\JBdel}[1]{\textcolor{red}{\sout{#1}}}
+\newcommand{\JBadd}[1]{{\textcolor{red}{#1}}}
+
+\newcommand{\FORGET}[1]{}
+\newcommand{\HFCprime}{$\text{HFC}'$}
+\newcommand{\coherentEnv}[3]{\textit{WFVTE}(#3;#1)}
+
+
+% % % % % % % % % % % % % % % % % % % %
+% CALCULUS
+
+\newcommand{\trans}[2]{\mathcal{T}_{#1} \llbracket #2 \rrbracket}
+
+\newcommand{\HFC}{HFC}
+\newcommand{\Scafi}{{\sc{}ScaFi}\xspace}
+\newcommand{\Kotac}{{\sc{}KotAC}\xspace}
+\newcommand{\FKotac}{{\sc{}FKotAC}\xspace}
+\newcommand{\FSCAFI}{{\sc{}FScaFi}\xspace}
+\newcommand{\FSCAFIi}{{\sc{}FScaFi$'$}\xspace}
+\newcommand{\FeatherweightSCAFI}{{\sc{}Featherweight ScaFi}\xspace}
+
+\newcommand{\BNFcce}{{ ::=}}
+\newcommand{\BNFmid}{\;\bigr\rvert\;}
+
+\newcommand{\PROGRAM}{\mathtt{P}}
+\newcommand{\FUNCTION}{\mathtt{F}}
+\newcommand{\AFUNCTION}{\mathtt{aF}}
+\newcommand{\SFUNCTION}{\mathtt{sF}}
+\newcommand{\IMPORT}{\mathtt{I}}
+
+\newcommand{\main}{\mathtt{main}}
+\newcommand{\e}{\mathtt{e}}
+\newcommand{\aexp}{\mathtt{ae}}
+\newcommand{\sexp}{\mathtt{se}}
+\newcommand{\s}{\mathtt{s}}
+\newcommand{\emain}{\e_{\main}}
+\newcommand{\fname}{\mathtt{d}}
+\newcommand{\afname}{\mathtt{ad}}
+\newcommand{\sfname}{\mathtt{sd}}
+\newcommand{\xname}{\mathtt{x}}
+\newcommand{\yname}{\mathtt{y}}
+\newcommand{\zname}{\mathtt{z}}
+\newcommand{\bname}{\mathtt{b}}
+\newcommand{\abname}{\mathtt{ab}}
+\newcommand{\sbname}{\mathtt{sb}}
+\newcommand{\oname}{\mathtt{o}}
+\newcommand{\ofname}{\mathtt{g}}
+\newcommand{\iname}{\mathtt{m}}
+
+\newcommand{\lvalueSet}{\mathcal{L}}
+
+\newcommand{\anyvalue}{\mathtt{v}}
+\newcommand{\sanyvalue}{\mathtt{sv}}
+\newcommand{\lvalue}{\ell}
+\newcommand{\alvalue}{a\ell}
+\newcommand{\slvalue}{s\ell}
+\newcommand{\fvalue}{\phi}
+\newcommand{\funvalue}{\mathtt{f}}
+\newcommand{\afunvalue}{\mathtt{af}}
+\newcommand{\sfunvalue}{\mathtt{sf}}
+\newcommand{\svalue}{\mathtt{s}}
+\newcommand{\snvalue}{\mathtt{r}}
+\newcommand{\truevalue}{\mathtt{True}}
+\newcommand{\falsevalue}{\mathtt{False}}
+\newcommand{\zerovalue}{0}
+
+\newcommand{\dc}{\mathtt{c}}
+\newcommand{\dcOf}[2]{#1(#2)}
+
+\newcommand{\auxNAME}{\textit{aux}}
+\newcommand{\aux}[1]{\auxNAME(#1)}
+\newcommand{\bodyNAME}{\textit{
+body}}
+\newcommand{\body}[1]{\bodyNAME(#1)}
+\newcommand{\argsNAME}{\textit{args}}
+\newcommand{\args}[1]{\argsNAME(#1)}
+\newcommand{\nameOf}{\textit{name}}
+
+\newcommand{\FVname}{\textbf{FV}}
+\newcommand{\FV}[1]{\FVname(#1)}
+\newcommand{\FTVname}{\textbf{FTV}}
+\newcommand{\FTV}[1]{\FTVname(#1)}
+
+\newcommand{\spawnK}{\mathtt{spawn}}
+\newcommand{\defK}{\mathtt{def}}
+\newcommand{\funK}{\mathtt{fun}}
+\newcommand{\nbrK}{\mathtt{nbr}}
+\newcommand{\alignK}{\mathtt{align}}
+\newcommand{\repK}{\mathtt{rep}}
+\newcommand{\shareK}{\mathtt{share}}
+\newcommand{\fifK}{\mathtt{if}}
+\newcommand{\elseK}{\mathtt{else}}
+\newcommand{\ifK}{\mathtt{branch}}
+\newcommand{\foldK}{\mathtt{foldhood}}
+\newcommand{\foldexclK}{\mathtt{foldhoodPlus}}
+\newcommand{\foldincK}{\mathtt{foldincl}}
+\newcommand{\letK}{\mathtt{let}\;}
+\newcommand{\inK}{\;\mathtt{in}\;}
+
+\newcommand{\aggrK}{@@}
+\newcommand{\eqSymK}[1]{\mathrm{ \texttt{= \aggrK \{} #1 \texttt{\}} }}
+\newcommand{\feqSymK}[1]{\mathrm{ \texttt{= \{} #1 \texttt{\}} }}
+\newcommand{\ftoSymK}[1]{\mathrm{ \texttt{=>\{}#1\texttt{\}} }}
+\newcommand{\ftoSym}[1]{\mathrm{ \texttt{=>}#1 }}
+\newcommand{\toSymK}[1]{\mathrm{ \texttt{=> \aggrK\{} #1 \texttt{\}} }}
+\newcommand{\toSymKtag}[2]{\toSym{#1}\mathrm{ \texttt{\aggrK\{} #2 \texttt{\}}}}
+\newcommand{\toSymKabs}[1]{\mathrm{ \texttt{=>} #1  }}
+
+\newcommand{\toSym}[1]{\stackrel{#1}{\mathrm{\texttt{=>}}}}
+\renewcommand{\name}{\tau}
+
+
+\newcommand{\fstK}{\mathtt{fst}}
+\newcommand{\sndK}{\mathtt{snd}}
+\newcommand{\headK}{\mathtt{head}}
+\newcommand{\tailK}{\mathtt{tail}}
+
+\newcommand{\setK}{\mathtt{set}}
+\newcommand{\mapK}{\mathtt{map}}
+\newcommand{\pairK}{\mathtt{pair}}
+\newcommand{\consK}{\mathtt{cons}}
+\newcommand{\PairK}{\mathtt{Pair}}
+\newcommand{\NullK}{\mathtt{Null}}
+\newcommand{\ConsK}{\mathtt{Cons}}
+\newcommand{\listK}{\mathtt{list}}
+
+\newcommand{\pairltypeOf}[2]{\pairK(#1,#2)}
+\newcommand{\listltypeOf}[1]{\listK(#1)}
+
+\newcommand{\nbrlt}{\mathtt{nbrlt}}
+
+\newcommand{\selfK}{\mathtt{uid}}
+\newcommand{\muxK}{\mathtt{mux}}
+\newcommand{\minHoodK}{\texttt{minhood}}
+\newcommand{\pickHoodK}{\texttt{pickhood}}
+\newcommand{\snsNumK}{\texttt{snsnum}}
+\newcommand{\snsFunK}{\texttt{snsfun}}
+
+
+% % % % % % % % % % % % % % % % % % % %
+% TYPING
+
+\newcommand{\type}{\textit{T}}
+\newcommand{\atype}{\textit{AT}}
+\newcommand{\tann}{\textit{A}}
+\newcommand{\tctx}{\textit{k}}
+\newcommand{\ltype}{\textit{L}}
+\newcommand{\ftype}{\textit{F}}
+\newcommand{\rtype}{\textit{R}}
+\newcommand{\stype}{\textit{S}}
+\newcommand{\builtintype}{\textit{B}}
+\newcommand{\bitype}{\textit{D}}
+\newcommand{\ltypeset}{\textit{Lset}}
+
+\newcommand{\ftypeOf}[1]{\mathtt{field}(#1)}
+\newcommand{\atOf}[2]{\langle #1, #2 \rangle}
+
+\newcommand{\btype}{\mathtt{bool}}
+\newcommand{\ntype}{\mathtt{num}}
+
+\newcommand{\stvar}{s}
+\newcommand{\rtvar}{r}
+\newcommand{\ltvar}{l}
+\newcommand{\tvar}{t}
+\newcommand{\bvar}{d}
+\newcommand{\aann}{\textit{a}}
+\newcommand{\sann}{\textit{s}}
+
+\newcommand{\typescheme}{\textit{TS}}
+\newcommand{\ltypescheme}{\textit{LS}}
+
+\newcommand{\TtypEnv}{\mathcal{A}}
+\newcommand{\OtypEnv}{\mathcal{S}}
+\newcommand{\MtypEnv}{\mathcal{M}}
+\newcommand{\OStypEnv}{\mathcal{B}}
+\newcommand{\TStypEnv}{\mathcal{D}}
+\newcommand{\LTStypEnv}{\mathcal{D}}
+\newcommand{\typeofNAME}{\OStypEnv}
+\newcommand{\typeof}[1]{\typeofNAME(#1)}
+
+\newcommand{\expTypJud}[4]{#1 ; #2 \vdash #3 : #4}
+\newcommand{\expTypJudC}[5]{#1 ; #2 ; #3 \vdash #4 : #5}
+\newcommand{\funTypJud}[3]{#1 \vdash #2 : #3}
+\newcommand{\proTypJud}[2]{\vdash #1 : #2}
+
+\newcommand{\surfaceTyping}[3]{
+  \begin{array}{l@{\;}c}
+    \stackrel{~}{{\tiny \textrm{[#1]}}} & #2 \\ \hline 
+    \multicolumn{2}{c}{#3}
+  \end{array}
+}
+\newcommand{\nullsurfaceTyping}[2]{
+  \surfaceTyping{#1}{}{#2}
+}
+
+
+% % % % % % % % % % % % % % % % % % % %
+% OPERATIONAL SEMANTICS
+
+\newcommand{\deviceIdSet}{\textbf{D}}
+\newcommand{\builtinop}[3]{\llparenthesis #1 \rrparenthesis_{#2}^{#3}}
+\newcommand{\filter}{F}
+
+\newcommand{\Trees}{\Theta}
+\renewcommand{\emptyseq}{\bullet}
+
+\newcommand{\devset}{I}
+\newcommand{\Topo}{\tau}
+\newcommand{\Sens}{\Sigma}
+\newcommand{\Envi}{\textit{Env}}
+\newcommand{\EnviS}[2]{#1,#2}
+\newcommand{\SystS}[2]{\langle #1;#2\rangle}
+\newcommand{\Field}{\Psi}
+\newcommand{\Cfg}{N}
+\newcommand{\wfn}[1]{\textit{WFE}(#1)}
+\newcommand{\senstate}{\sigma}
+
+\newcommand{\nettran}[3]{#1\xrightarrow{#2} #3}
+\newcommand{\act}{\textit{act}}
+\newcommand{\envact}{\textit{env}}
+
+\newcommand{\envmap}[2]{#1\mapsto #2}
+\newcommand{\mapupdate}[2]{#1[#2]}
+\newcommand{\proj}[2]{{#1}|_{#2}}
+
+\newcommand{\ruleNameSize}[1]{{\scriptsize #1}}
+
+\newcommand{\domofNAME}{\mathcal{D}}
+\newcommand{\domof}[1]{\domofNAME_{#1}}
+\newcommand{\erasureofNAME}{\textbf{erasure}}
+\newcommand{\erasureof}[1]{\erasureofNAME(#1)}
+
+\newcommand{\vtree}{\theta}
+\newcommand{\mkvtree}[3]{#2 \langle #3 \rangle}
+\newcommand{\mkvt}[2]{#1 \langle #2 \rangle}
+\newcommand{\piB}[1]{\pi^{#1}}
+\newcommand{\piBof}[2]{\piB{#1}(#2)}
+\newcommand{\piI}[1]{\pi_{#1}}
+\newcommand{\piIof}[2]{\piI{#1}(#2)}
+\newcommand{\piIofOv}[1]{\overline{\pi}(#1)}
+
+\newcommand{\lengthOf}[1]{\textit{length}(#1)}
+
+\newcommand{\bsopsem}[5]{#1;#2;#3\vdash #4\Downarrow #5}
+\newcommand{\deviceId}{\delta}
+\newcommand{\vroot}{\mathbf{\rho}}
+\newcommand{\vrootOf}[1]{\vroot(#1)}
+\newcommand{\substitution}[2]{#1:=#2}
+\newcommand{\applySubstitution}[2]{#1[#2]}
+\newcommand{\bsopsemFAIL}[4]{#1;#2;#3\vdash #4\;\FAIL}
+\newcommand{\FAIL}{\textup{\textsc{fail}}}
+
+
+\newcommand{\skiptransition}{\\[10pt]}
+\newcommand{\skiptransitionR}{\\[-3pt]}
+\newcommand{\skiptransitionN}{\\[-2.22pt]}
+
+\newcommand{\netopsemRule}[3]{\surfaceTyping{#1}{#2}{#3}}
+
+\newcommand{\coherent}[3]{\mathcal{C}^{#2}_{#3}[#1]}
+
+%\newcommand{\denotf}[2]{\lambda #1.#2}
+
+
+% % % % % % % % % % % % % % % % % % % %
+% DENOTATIONAL SEMANTICS
+\DeclareMathOperator{\lightcone}{LC}
+\DeclareMathOperator{\connected}{CD}
+\newcommand{\disjcup}{\biguplus}
+\newcommand{\powerset}{\mathcal{P}}
+\newcommand{\shift}[1]{\textbf{shift}(#1)}
+\newcommand{\builtindenot}[2]{\mathcal{#1}\llbracket #2 \rrbracket}
+\newcommand{\predevices}[1]{{#1}^{{}^-}\!\!\!}
+\newcommand{\nbrdevice}[2]{{#1}^{#2}}
+\newcommand{\repdevice}[1]{{#1}^-}
+\newcommand{\decay}[0]{t_{\mathtt{d}}}
+\newcommand{\FieldS}[0]{\mathcal{F}}
+\newcommand{\PathS}[0]{\mathbf{P}}
+\newcommand{\pathS}[0]{P}
+\newcommand{\VarS}[0]{X}
+\newcommand{\varS}[0]{\mathtt{X}}
+\DeclareMathOperator{\rank}{rank}
+\newcommand{\aEventS}[0]{\mathbb{E}}
+\newcommand{\EventCone}[0]{\mathbf{EC}}
+\newcommand{\EventSet}[0]{\mathbf{ES}}
+\newcommand{\EventS}[0]{\mathbf{E}}
+\newcommand{\eventS}[0]{E}
+\newcommand{\eventId}[0]{\epsilon}
+\newcommand{\timeS}[0]{t}
+\newcommand{\posS}[0]{p}
+\newcommand{\event}[3]{\langle #1,#2,#3\rangle}
+\newcommand{\devF}[1]{\deviceId_{#1}}
+\newcommand{\timeF}[1]{\timeS_{#1}}
+\newcommand{\posF}[1]{\posS_{#1}}
+\newcommand{\domS}[0]{D}
+\newcommand{\DomS}[0]{\mathcal{D}}
+\newcommand{\DomDevF}[2]{#1(#2)}
+\newcommand{\DomTimeF}[2]{#1(#2)}
+\newcommand{\DomMTimeF}[2]{#1^{-}(#2)}
+\newcommand{\DomDomF}[2]{#1(#2)}
+\newcommand{\DomDevTimeF}[3]{#1(#2,#3)}
+\newcommand{\DomDevMTimeF}[3]{#1^{-}(#2,#3)}
+
+\newcommand{\feS}[0]{\Phi}
+\newcommand{\setVS}[0]{\textbf{V}}
+\newcommand{\setTS}[0]{\textbf{T}}
+\newcommand{\setCS}[0]{\textbf{C}}
+\newcommand{\setFS}[0]{\textbf{F}}
+
+\newcommand{\pto}{\mathrel{\ooalign{\hfil$\mapstochar$\hfil\cr$\to$\cr}}}
+\newcommand{\neighbour}[2]{\textit{neigh}(#1,#2)}
+\newcommand{\neigh}{\rightsquigarrow}
+
+\newcommand{\denot}[1]{\mathcal{E}\llbracket{#1}\rrbracket}
+\newcommand{\denotapp}[2]{\denot{#1}_{#2}}
+\newcommand{\denotappsub}[3]{\denot{#1}_{#2}^{#3}}
+\newcommand{\denotfun}[3]{\mathcal{L}\llbracket{#1}\rrbracket_{#2}^{#3}}
+\newcommand{\denottype}[1]{\mathcal{T}\llbracket{#1}\rrbracket}
+\newcommand{\denotval}[1]{\mathcal{V}\llbracket {#1} \rrbracket}
+\newcommand{\denotexp}[3]{\mathcal{E}\llbracket {#1} \rrbracket_{#2}^{#3}}
+\newcommand{\denotf}[2]{\lambda #1.#2}
+\newcommand{\dvalue}[0]{\mathrm{\Phi}}
+
+
+% % % % % % % % % % % % % % % % % % % %
+% CODE HIGHLIGHTING
+
+\definecolor{dark-gray}{gray}{0}
+\newcommand{\il}[1]{{\it \textcolor{dark-gray}{// #1}}} % inline comment
+\newcommand{\km}[1]{{\textcolor{red}{#1}}} % key mechanism primitives
+\renewcommand{\fn}[1]{\textcolor{violet}{#1}} % function calls
+\newcommand{\pr}[1]{\texttt{\textcolor{blue}{#1}}} % primitives
+\newcommand{\high}[1]{\underline{#1}} % highlight currently executed subexpression
+
+
+% % % % % % % % % % % % % % % % % % % %
+% PARENTHESIS
+
+\newcommand{\cp}[1]{\left( #1 \right)}
+\newcommand{\qp}[1]{\left[ #1 \right]}
+%\newcommand{\Qp}[1]{\left\llbracket #1 \right\rrbracket}
+%\newcommand{\ap}[1]{\left\langle #1 \right\rangle}
+\newcommand{\ap}[1]{\langle #1 \rangle}
+\newcommand{\bp}[1]{\left\lbrace #1 \right\rbrace}
+\newcommand{\vp}[1]{\left\lvert #1 \right\rvert}
+\newcommand{\floor}[1]{\left\lfloor #1 \right\rfloor}
+\newcommand{\ceil}[1]{\left\lceil #1 \right\rceil}
+
+
+% % % % % % % % % % % % % % % % % % % %
+% MISC
+
+\DeclareMathOperator{\norm}{norm}
+\DeclareMathOperator{\dist}{dist}
+
+\newcommand{\res}{\upharpoonright}
+
+\newcommand{\stval}[1]{\setVS(#1)}
+\newcommand{\stvals}{\stval{\ast}}
+\newcommand{\stvalc}{\stval{\top}}
+
+\newcommand{\TMc}{\text{TM}_{\textit{cone}}}
+\newcommand{\TMl}{\text{TM}_{\textit{loc}}}
+
+\newcommand{\restatement}[4]{\noindent \textbf{Restatement of #1 \ref{#2} (#3).} \textit{#4}}
+
+\newcommand{\ifKhfc}{\mathtt{if}}
+
+\newcommand{\corrstart}{}%{\color{magenta}}
+\newcommand{\corrend}{}%{\color{black}}
+\newcommand{\correction}[1]{\corrstart #1\corrend{}}
+
+\newcommand{\corrstartB}{\color{magenta}}
+\newcommand{\correndB}{\color{black}}
+\newcommand{\correctionB}[1]{\corrstartB #1\correndB{}}

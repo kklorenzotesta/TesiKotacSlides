@@ -1,0 +1,257 @@
+\documentclass[10pt]{beamer} %,aspectratio=169,handout
+	\usetheme{CambridgeUS} %CambridgeUS, Goettingen, Singapore, Madrid
+	\setbeamertemplate{footline}[frame number]
+	\setbeamercovered{transparent}
+	\beamertemplatenavigationsymbolsempty
+
+\usepackage{multimedia}
+\usepackage{tabularx}
+\usepackage{listings}
+\usepackage{forloop}
+\usepackage{mathtools}
+\usepackage{tikz}
+
+\newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
+\setlength\tabcolsep{4pt}
+
+\newcounter{prog}
+\newcommand{\progress}[2]{$\forloop{prog}{0}{\value{prog} < #1}{\bullet}\forloop{prog}{0}{\value{prog} < #2}{\circ}$}
+\newcounter{secslide}
+\newcounter{sectotal}
+\newcounter{secother}
+\newcommand{\resetsec}[1]{\setcounter{secslide}{0}\setcounter{sectotal}{#1}}
+\newcommand{\slidecount}{\addtocounter{secslide}{1}\setcounter{secother}{\value{sectotal} - \value{secslide}}\subsection[\progress{\value{secslide}}{\value{secother}}]{slide}}
+
+\usepackage{statecharts-style}
+\usepackage{xspace} 
+
+\include{macrosMain}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+\definecolor{darkgreen}{rgb}{0,0.5,0}
+\definecolor{mylightgray}{rgb}{0.97,0.97,0.97}
+
+\lstdefinelanguage{hfc}{
+	basicstyle=\lst@ifdisplaystyle\small\fi\ttfamily,
+	frame=single,
+	basewidth=0.5em,
+	sensitive=true,
+	morestring=[b]",
+	morecomment=[l]{//},
+	morecomment=[n]{/*}{*/},
+	commentstyle=\color{OliveGreen},
+	keywordstyle=\color{blue}\textbf, keywords={def}, otherkeywords={=>},
+	keywordstyle=[2]\color{red}\textbf, keywords=[2]{rep,nbr,if,let,in},
+	keywordstyle=[3]\color{violet}, keywords=[3]{mux,nbrRange,sumHood,countHood,everyHood,anyHood,minHood,maxHood,foldHood,maxHoodPlusSelf},
+	keywordstyle=[4]\color{orange}\textbf, keywords=[4]{spawn,share},
+	keywordstyle=[5]\color{blue}, keywords=[5]{false,true,infinity}
+}
+
+\lstdefinelanguage{Protelis}{
+    language=Java,
+    morecomment=[l]{//},
+    morecomment=[s]{/*}{*/},
+    keywords={def, else, import, mux, sumHood, PlusSelf, let, rep, env, self, pi, if, e, public, NaN, false, true, minHood, maxHood, nbrRange, nbr, Infinity},
+    frame=no,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    backgroundcolor=\color{mylightgray},    
+    basicstyle=\ttfamily\small,
+    keywordstyle=\bfseries\color{red},
+    emphstyle={\bfseries\color{blue}},
+    stringstyle=\ttfamily\color{purple},
+    commentstyle=\ttfamily\color{mygreen}
+}
+
+\lstdefinelanguage{scafi}{
+  keywords={abstract,case,catch,class,def,%
+    do,else,extends,final,finally,%
+    for,if,implicit,import,match,mixin,%
+    new,null,object,override,package,%
+    private,protected,requires,return,sealed,%
+    super,this,throw,trait,try,lazy,%
+    type,val,var,while,with,yield,forSome},
+  otherkeywords={=>,<-,<\%,<:,>:,\#},
+  keywordstyle=\color{blue},
+  keywordstyle=[2]\color{red}\textbf,
+  keywords=[2]{rep,nbr,foldhood,@@},
+  keywordstyle=[3]\color{violet}\textbf,
+  keywords=[3]{nbrvar,sense,branch,mid,mux,nbrRange,sumHood,pickHood,
+  	countHood,minHood,maxHood,foldhoodPlus,G,C,S,T,broadcast,
+  	distanceTo,summarize,minHoodPlus,gradient,
+  	collectSets,collectSet,priorityS,Metric},
+  keywordstyle=[4]\color{orange},
+  keywordstyle=[5]\color{darkgray},
+  sensitive=true,
+  morecomment=[l]{//},
+  morecomment=[n]{/*}{*/},
+  commentstyle=\color{mygreen},
+  morestring=[b]",
+  morestring=[b]',
+  morestring=[b]""",
+  moredelim=[is][\color{gray}\bfseries\underbar]{?-}{-?}
+} 
+
+\lstdefinelanguage{kotac}{
+  keywords={abstract,case,catch,class,fun,%
+    do,else,extends,final,finally,%
+    for,if,implicit,import,match,mixin,%
+    new,null,object,override,package,%
+    private,protected,requires,return,sealed,%
+    super,this,throw,interface,try,lazy,%
+    type,val,var,while,with,yield,forSome},
+  otherkeywords={=>,<-,<\%,<:,>:,\#},
+  keywordstyle=\color{blue},
+  keywordstyle=[2]\color{red}\textbf,
+  keywords=[2]{rep,nbr,foldhood,map,share,align,fold,@@},
+  keywordstyle=[3]\color{violet}\textbf,
+  keywords=[3]{nbrvar,sense,branch,mid,mux,nbrRange,sumHood,pickHood,
+  	countHood,minHood,maxHood,foldhoodPlus,G,C,S,T,broadcast,any,
+  	distanceTo,summarize,minHoodPlus,gradient,
+  	collectSets,collectSet,priorityS,Metric},
+  keywordstyle=[4]\color{orange},
+  keywordstyle=[5]\color{darkgray},
+  sensitive=true,
+  morecomment=[l]{//},
+  morecomment=[n]{/*}{*/},
+  commentstyle=\color{mygreen},
+  morestring=[b]",
+  morestring=[b]',
+  morestring=[b]""",
+  moredelim=[is][\color{gray}\bfseries\underbar]{?-}{-?}
+} 
+
+\lstdefinelanguage{fscafi}{
+  keywords={abstract,case,catch,class,def,%
+    do,else,extends,final,finally,%
+    for,if,implicit,import,match,mixin,%
+    new,null,object,override,package,%
+    private,protected,requires,return,sealed,%
+    super,this,throw,trait,try,lazy,%
+    type,val,var,while,with,yield,forSome},
+  otherkeywords={=>,<-,<\%,<:,>:,\#},
+  keywordstyle=\color{black}\textbf,
+  keywordstyle=[2]\color{black}\textbf,
+  keywords=[2]{rep,nbr,foldhood,branch,@@},
+  keywordstyle=[3]\color{black}\textbf,
+  keywords=[3]{false,true,nbrvar,sense,mid,mux,nbrRange,sumHood,pickHood,countHood,minHood,maxHood,foldhoodPlus,G,C,S,T,broadcast,distanceTo,summarize,minHoodPlus},
+  keywordstyle=[4]\color{black},
+  keywordstyle=[5]\color{black},
+  sensitive=true,
+  morecomment=[l]{//},
+  morecomment=[n]{/*}{*/},
+  commentstyle=\color{darkgreen},
+  morestring=[b]",
+  morestring=[b]',
+  morestring=[b]""",
+  basicstyle=\lst@ifdisplaystyle\small\fi\ttfamily
+} 
+
+\lstdefinestyle{mystyle}{showstringspaces=false,keepspaces=true,basicstyle=\small\lst@ifdisplaystyle\footnotesize\selectfont\fi\ttfamily,commentstyle=\itshape,stringstyle=\sffamily,backgroundcolor = \color{lightgray!8},frame=single,
+%numbers=left,
+emphstyle=\ttfamily\bfseries}
+\lstset{style={mystyle},language={scafi},moredelim=[is][\color{gray}\bfseries\underbar]{@}{@}}
+
+\lstdefinelanguage{hfc}{
+    language=Java,
+    morecomment=[l]{//},
+    morecomment=[s]{/*}{*/},
+    keywords={def, let, rep, if, nbr},
+    frame=no,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    backgroundcolor=\color{mylightgray},    
+    basicstyle=\ttfamily\small,
+    keywordstyle=\bfseries\color{red},
+    emphstyle={\bfseries\color{blue}},
+    stringstyle=\ttfamily\color{purple},
+    commentstyle=\ttfamily\color{mygreen}
+}
+
+\lstdefinelanguage{json}{
+    basicstyle=\ttfamily\small,
+    morestring=[b]",
+    morestring=[d]',
+    showstringspaces=false,
+    breaklines=true,
+    frame=lines,
+    backgroundcolor=\color{background},
+    literate=
+     *{:}{{{\color{punct}{:}}}}{1}
+      {,}{{{\color{punct}{,}}}}{1}
+      {\{}{{{\color{delim}{\{}}}}{1}
+      {\}}{{{\color{delim}{\}}}}}{1}
+      {[}{{{\color{delim}{[}}}}{1}
+      {]}{{{\color{delim}{]}}}}{1},
+}
+
+\lstdefinestyle{json}
+{
+  showstringspaces    = false,
+  keywords            = {false,true},
+  alsoletter          = 0123456789.,
+  morestring          = [s]{"}{"},
+  stringstyle         = \ifcolonfoundonthisline\JSONstringvaluestyle\fi,
+  MoreSelectCharTable =%
+    \lst@DefSaveDef{`:}\colon@json{\processColon@json},
+  basicstyle          = \ttfamily,
+  keywordstyle        = \ttfamily\bfseries,
+}
+
+\titleformat
+{\chapter} % command
+[display] % shape
+{\bfseries\LARGE} % format
+{\Large{{\sc \ifthenelse{\equal{A}{\thechapter}}{Appendix}{Chapter} \ \thechapter}}} % label
+{-.2em} % sep
+{
+    \rule{\textwidth}{1pt}
+    \vspace{1ex}
+    \centering
+} % before-code
+[
+\vspace{-.85em}%
+\rule{\textwidth}{0.3pt}
+] % after-code
+
+%switch margins (left and right)
+\let\tmp\oddsidemargin
+\let\oddsidemargin\evensidemargin
+\let\evensidemargin\tmp
+\reversemarginpar
+
+
+%\usepackage[edges]{forest} % to print directories tree
+\definecolor{orange}{rgb}{0.85,0.4,0}
+\definecolor{darkblue}{rgb}{0.0,0.0,0.6}
+\definecolor{folderbg}{RGB}{124,166,198}
+\definecolor{folderborder}{RGB}{110,144,169}
+\definecolor{foldercolor}{RGB}{124,166,198}
+\def\Size{4pt}
+\tikzset{
+  folder/.pic={
+    \filldraw[draw=folderborder,top color=folderbg!50,bottom color=folderbg]
+      (-1.05*\Size,0.2\Size+5pt) rectangle ++(.75*\Size,-0.2\Size-5pt);  
+    \filldraw[draw=folderborder,top color=folderbg!50,bottom color=folderbg]
+      (-1.15*\Size,-\Size) rectangle (1.15*\Size,\Size);
+  }
+}
+
+%% fancy headers
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[OL]{\nouppercase{\textsc\leftmark}}
+\fancyhead[EL,OR]{\thepage}
+
+\begin{document}
+
+\title{A Domain Specific Language for Aggregate Programming}
+\date{20th October 2020}
+\author{Lorenzo Testa}
+
+\newcommand*\sequence[1]{$\overline{#1}$}
+

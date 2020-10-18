@@ -1,0 +1,612 @@
+\input{src/preamble.tex}
+
+\maketitle
+
+\begin{frame}
+\frametitle{Distributed systems}
+\begin{block}{Why distributed systems}
+Number, pervasiveness and variety of interconnected devices, forming the \textit{Internet of Things (IOT)}, is constantly increasing. New distributed application can be built thanks to this network, like crowd managment or data summarisation.
+\end{block}
+\begin{block}{Distributed systems challenges}
+\begin{itemize}
+\item decentralization
+\item high amount of data
+\item limited computing power
+\item heterogeneity of devices
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{Aggregate programming}
+\begin{block}{Why aggregate programming}
+\begin{itemize}
+\item multi-platform framework
+\item decentralized
+\item high level of abstraction
+\item composable abstractions of behavior
+\item global specification of programs
+\item based on the \textit{field calculus}
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\centering
+\frametitle{Aggregate programming layers}
+\includegraphics[height=7cm]{imgs/layers.pdf}
+\end{frame}
+
+\begin{frame}
+\frametitle{Field Calculus}
+\begin{block}{}
+Formal language and model for studying algorithms and properties based on the notion of \textit{computational fields}.
+
+Network of devices executing a common program in asyncronous rounds.
+\end{block}
+\begin{block}{Syntax}
+\centering
+\centerline{\scalebox{0.9}{$
+        \begin{array}{lcl@{\hspace{18mm}}r}
+                \PROGRAM & \BNFcce & \overline{\FUNCTION}  \; \e
+                &{ \mbox{\footnotesize program}}
+                \\[3pt]
+                \FUNCTION & \BNFcce &  \defK \,\; \fname (\overline{\xname}) \; \{ \e \}
+                &{ \mbox{\footnotesize function declaration}}
+                \\[3pt]
+                \e & \BNFcce &  \xname \;\BNFmid\; \anyvalue \;\BNFmid\;  (\overline{\xname}) \toSym{\name} \e \; \BNFmid \; \e(\overline\e) \;\BNFmid\;  &{ \mbox{\footnotesize expression}} \\
+&& \fifK (\e) \{\e\} \elseK \{\e\} \;\BNFmid \; \\
+                && \nbrK\{\e\} \;\BNFmid\; \repK(\e)\{ (\xname) \ftoSym \e \} \; \BNFmid \; \\
+                && \shareK(\e)\{(\xname) \ftoSym \e \}
+                \\[3pt]
+                \anyvalue & \BNFcce &  \lvalue \; \BNFmid \; \fvalue
+                &{ \mbox{\footnotesize value}}
+                \\[3pt]
+              \lvalue & \BNFcce &  \dcOf{\dc}{\overline\lvalue} \; \BNFmid \; \funvalue
+                &{ \mbox{\footnotesize local value}}
+                \\[3pt]
+                \fvalue & \BNFcce &  \envmap{\overline\deviceId}{\overline\lvalue}
+                &{ \mbox{\footnotesize neighbouring field value}}
+                \\[3pt]
+                \funvalue & \BNFcce &  \fname \; \BNFmid \; \bname \;\BNFmid\; (\overline{\xname}) \toSym{\name} \e 
+                &{ \mbox{\footnotesize function value}}
+                \\[3pt]
+        \end{array}
+        $}
+}
+\end{block}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Field Calculus}
+	\begin{block}{Example}
+\begin{lstlisting}[]
+def distanceTo(source) {
+  rep (infinity) { (d) =>
+    mux (source, 0, minHood(nbr{d} + nbrDist()))
+  }
+}
+\end{lstlisting}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{Goals and contributions}
+\begin{block}{}
+\begin{itemize}
+\item Overview of existing frameworks
+\item \Kotac{} framework API and partial implementation
+\item \FKotac{} semantics and typing formalization
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{Existing aggregate frameworks}
+\begin{block}{Protelis}
+\begin{itemize}
+\item External DSL
+\item Java interoperability
+\item Rich standard library
+\item Simulation with Alchemist
+\end{itemize}
+\end{block}
+\begin{block}{\Scafi}
+\begin{itemize}
+\item Internal DSL in Scala
+\item Expressive type-safe API
+\item Computation against a neighbour
+\item Akka integration
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{\Kotac}
+\begin{block}{}
+New aggregate programming framework for Kotlin.
+\begin{itemize}
+\item Internal DSL
+\item Explicit fields in the type-system
+\item Idiomatic Kotlin API
+\item Cross-platform
+\item Field calculus semantics
+\end{itemize}
+\end{block}
+\begin{block}{Operators API}
+\begin{lstlisting}[language={kotac}]
+interface AggregateContext {
+    fun <T> share(initial: T, f: (Field<T>) -> T): T
+    fun <K, T> align(key: K, proc: (K) -> T): T
+    fun <T> nbr(f: () -> T): Field<T>
+    fun <T> rep(initial: T, f: (T) -> T): T
+}
+\end{lstlisting}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{\Kotac}
+\begin{block}{Example}
+\begin{lstlisting}[language={kotac}]
+fun AggregateContext.gossipMin(value: Int): Int = share(value) { f ->
+	Math.min(f.min(), value)
+}
+\end{lstlisting}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{\FKotac}
+\begin{block}{}
+\FKotac{} is a subset of the \Kotac{} DSL used in order to formalize syntax, semantics and typing.
+
+Both aggregate function and Kotlin function have been formalized.
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{\FKotac}
+\begin{block}{Syntax}
+\centering
+\centerline{\scalebox{0.85}{$
+\begin{array}{l@{\hspace{1mm}}c@{\hspace{1mm}}l@{\hspace{-8mm}}r}
+        \PROGRAM & \BNFcce & \overline{\FUNCTION} \; \aexp
+                                                                                                                                                                                                        &   {\footnotesize \mbox{program}} \\[3pt]
+        \FUNCTION & \BNFcce &  \SFUNCTION \, \BNFmid \, \AFUNCTION
+                                                                                                                                                                                                        &   {\footnotesize \mbox{function declaration}} \\[3pt]
+        \hline \\[-6pt]
+        \SFUNCTION & \BNFcce &  \funK \; \sfname (\overline{\xname}) \; \{ \sexp \}
+                                                                                                                                                                                                        &   {\footnotesize \mbox{standard function declaration}} \\[3pt]
+        \sexp & \BNFcce & \xname \, \BNFmid \, \sanyvalue \, \BNFmid \, (\overline{\xname}) \; \ftoSym \{ \sexp \} \, \BNFmid \, \sexp(\overline{\sexp})
+                                                                                                                                                                                                        &   {\footnotesize \mbox{standard expression}} \\[3pt]
+                \sanyvalue & \BNFcce &  \lvalue \; \BNFmid \; \sfunvalue
+                &{ \mbox{\footnotesize standard value}}
+                \\[3pt]
+                \lvalue & \BNFcce &  \dcOf{\dc}{\overline\lvalue}
+                &{ \mbox{\footnotesize local data value}}
+                \\[3pt]
+        \sfunvalue & \BNFcce & \sbname \; \BNFmid \; \sfname \; \BNFmid \; (\overline{\xname}) \; \ftoSym \{ \sexp \}
+                                                                                                                                                                                                        &   {\footnotesize\mbox{standard function value}} \\
+        \hline \\[-6pt]
+        \AFUNCTION & \BNFcce &  \funK \; \afname (\overline{\xname}) \; \{ \alignK{\{\aexp\}} \}
+                                                                                                                                                                                                        &   {\footnotesize \mbox{aggregate function declaration}} \\[3pt]
+        \aexp & \BNFcce & \xname \, \BNFmid \, \anyvalue  \BNFmid \; (\overline{\xname}) \; \toSym{\name}{\{\alignK\{\aexp\}\}} \, \BNFmid \, \aexp(\overline{\aexp}) \, \BNFmid \,  &   {\footnotesize \mbox{aggregate expression}} \\
+        && \repK(\aexp)\{ (\xname) \ftoSym \aexp \} \, \BNFmid \, \nbrK\{\aexp\} \, \BNFmid \, \shareK(\aexp)\{(\xname) \ftoSym \aexp \} \\[3pt]
+                \anyvalue & \BNFcce &  \lvalue \; \BNFmid \; \funvalue \; \BNFmid \; \fvalue
+                &{ \mbox{\footnotesize value}}
+                \\[3pt]
+              \funvalue & \BNFcce &  \sfunvalue \; \BNFmid \; \afunvalue
+                &{ \mbox{\footnotesize function value}}
+                \\[3pt]
+                \fvalue & \BNFcce &  \envmap{\overline\deviceId}{\overline\lvalue}
+                &{ \mbox{\footnotesize neighbouring field value}} \\
+        \afunvalue & \BNFcce & \abname \; \BNFmid \; \afname \; \BNFmid \; (\overline{\xname}) \; \toSym{\name}{\{\alignK\{\aexp\}\}}
+                                                                                                                                                                                                        &   {\footnotesize\mbox{aggregate function value}} \\
+\end{array}
+        $}
+}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{\FKotac}
+\begin{block}{Operational Semantics (1)}
+ \scalebox{0.75}{
+ $\begin{array}{l}
+ \textbf{Value-trees and value-tree environments:}\\
+\begin{array}{lcl@{\hspace{6.8cm}}r}
+%
+\vtree & \BNFcce &  \mkvt{\anyvalue}{\overline{\vtree}}    &   {\footnotesize \mbox{value-tree}} \\
+\Trees & \BNFcce & \envmap{\overline{\deviceId}}{\overline{\vtree}}   &   {\footnotesize \mbox{value-tree environment}}
+%
+\end{array}\\[10pt]
+\hline\\[-8pt]
+%%%%  AUX
+\textbf{Auxiliary functions:}\\
+\begin{array}{l}
+\begin{array}{l@{\hspace{1cm}}l}
+%
+\vrootOf{\mkvt{\anyvalue}{\overline{\vtree}}}  =   \anyvalue
+\\
+\vroot^\funvalue(\mkvt{\anyvalue}{\overline{\vtree}})  = \mkvt{\anyvalue}{} \text{ if } \funvalue \text{ standard else } \mkvt{\anyvalue}{\overline{\vtree}}
+\\
+%
+\piIof{i}{\mkvt{\anyvalue}{\vtree_1,\ldots,\vtree_n}}  =   \vtree_i
+\quad \mbox{if} \; 1\le i \le n
+\\
+\piBof{\funvalue}{\mkvt{\anyvalue}{\vtree_0,\ldots,\vtree_{n+1}}}  =   \vtree_{n+1}
+\quad \mbox{if} \; \nameOf(\vrootOf{\vtree_{0}}) = \nameOf(\funvalue) \text{ and } \funvalue \text{ not standard}
+\\
+ \piBof{\funvalue}{\vtree}  =   \emptyseq \quad \mbox{otherwise}
+\\  
+\end{array}
+\\
+\mbox{For } \auxNAME\in\rho,\piI{i},\piB{\funvalue}:
+\quad 
+\left\{\begin{array}{lcll}
+ \aux{\envmap{\deviceId}{\vtree}, \Trees}  & =  & \envmap{\deviceId}{\aux{\vtree}}, \aux{\Trees} & \quad \mbox{if} \; \aux{\vtree} \not=\emptyseq  
+\\
+\aux{\envmap{\deviceId}{\vtree}, \Trees}  & =   & \aux{\Trees} & \quad \mbox{if} \; \aux{\vtree}=\emptyseq  
+\\
+\aux{\emptyseq}  & =  &  \emptyseq
+\end{array}\right.   
+\\
+\begin{array}{ll}
+\nameOf(\fname) = \fname \qquad \nameOf(\bname) = \bname
+&
+\nameOf((\overline{\xname}) \; \toSym{\name}{\{\alignK\{\e\}\}}) = \name
+\\
+\args{\fname} = \overline{\xname} \quad \mbox{if } \, \funK \; \fname (\overline{\xname}) \; \{ \alignK{\{\e\}} \}
+&
+\args{\fname} = \overline{\xname} \quad \mbox{if } \, \funK \; \fname (\overline{\xname}) \; \{ \e \}
+\\
+\args{(\overline{\xname}) \; \toSym{\name}{\{\alignK\{\e\}\}}} = \overline{\xname}
+&
+\args{(\overline{\xname}) \; \ftoSym \{ \e \}} = \overline{\xname}
+\\
+\body{\fname} = \e  \quad \mbox{if } \, \funK \; \fname (\overline{\xname}) \; \{ \alignK{\{\e\}} \}
+&
+\body{\fname} = \e  \quad \mbox{if } \,  \funK \; \fname (\overline{\xname}) \; \{ \e \}
+\\
+\body{(\overline{\xname}) \; \toSym{\name}{\{\alignK\{\e\}\}}} = \e
+&
+\body{(\overline{\xname}) \; \ftoSym \{ \e \}} = \e
+\end{array}
+\\
+\begin{array}{l@{\hspace{0.4cm}}l}
+		\fvalue_0[\fvalue_1] = \fvalue_2 \; \text{ where } \fvalue_2(\deviceId) = \left\lbrace \begin{array}{ll}
+			\fvalue_1(\deviceId) & \text{if } \deviceId \in \domof{\fvalue_1} \\
+			\fvalue_0(\deviceId) & \text{otherwise}
+		\end{array} \right. \\
+\end{array}
+\end{array}\\
+\end{array}$
+}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{\FKotac}
+\begin{block}{Operational Semantics (2)}
+ \scalebox{0.85}{
+ $\begin{array}{l}
+\textbf{Syntactic shorthands:}\\
+\begin{array}{l@{\hspace{5pt}}l@{\hspace{5pt}}l}
+\bsopsem{\deviceId}{\piIofOv{\Trees}}{\senstate}{\overline{\e}}{\overline{\vtree}}
+&
+  \textrm{where~~} |\overline{\e}|=n
+&
+  \textrm{for~~}
+  \bsopsem{\deviceId}{\piIof{1}{\Trees}}{\senstate}{\e_1}{\vtree_1}
+    \cdots
+    \bsopsem{\deviceId}{\piIof{n}{\Trees}}{\senstate}{\e_n}{\vtree_n} \!\!\!\!\!\!\!\!\!\!\!\! \\
+\vrootOf{\overline{\vtree}}
+&
+  \textrm{where~~} |\overline{\vtree}|=n
+  & \textrm{for~~}
+\vrootOf{\vtree_1},\ldots,\vrootOf{\vtree_n}\\
+\substitution{\overline{\xname}}{\vrootOf{\overline{\vtree}}}
+&   \textrm{where~~} |\overline{\xname}|=n
+  &
+  \textrm{for~~}
+\substitution{\xname_1}{\vrootOf{\vtree_1}}~\ldots\quad\substitution{\xname_n}{\vrootOf{\vtree_n}}
+\end{array}\\
+\hline\\[-10pt]
+%%%  EVALUATION RULES
+\textbf{Rules for expression evaluation:} \hspace{4.4cm} %\hfill
+%\vspace{-0.2cm}
+  \boxed{\bsopsem{\deviceId}{\Trees}{\senstate}{\e}{\vtree}}
+\skiptransition%[-5pt]
+\begin{array}{c}
+%\vspace{-0.1cm}
+\surfaceTyping{E-LOC}{
+	\e = \lvalue \text{ or } \funvalue
+}{
+	\bsopsem{\deviceId}{\Trees}{\senstate}{\e}{\mkvt{\e}{}}
+}
+\qquad\qquad
+\surfaceTyping{E-FLD}{\qquad \fvalue' = \proj{\fvalue}{\domof{\Trees}\cup\{\deviceId\}}}{
+\bsopsem{\deviceId}{\Trees}{\senstate}{\fvalue}{\mkvt{\fvalue'}{}}
+}
+\skiptransition\\[-6pt]
+\surfaceTyping{E-B-APP}{  \quad
+\begin{array}{c}
+  \bsopsem{\deviceId}{\piIofOv{\Trees}}{\senstate}{\overline{\e},\e}{\overline{\vtree},\vtree}
+  \qquad \bname = \vrootOf{\vtree}
+  \qquad \vtree'=\builtinop{\bname}{\correction{\deviceId}}{\piBof{\bname}{\Trees},\senstate}(\vrootOf{\overline{\vtree}})
+\end{array}
+ }{
+\bsopsem{\deviceId}{\Trees}{\senstate}{\e(\overline{\e})}{\mkvt{\vrootOf{\vtree'}}{\vtree,\overline{\vtree},\vroot^\bname(\vtree')}}
+}
+%
+\skiptransition\\[-6pt]
+%
+\surfaceTyping{E-D-APP}{ \quad
+\begin{array}{c}
+  \bsopsem{\deviceId}{\piIofOv{\Trees}}{\senstate}{\overline{\e},\e}{\overline{\vtree},\vtree} \qquad 
+  \funvalue=\vrootOf{\vtree} \mbox{ not a built-in} \qquad
+\\
+  \bsopsem{\deviceId}{\piBof{\funvalue}{\Trees}}{\senstate}{\applySubstitution{\body{\funvalue}}{\substitution{\args{\funvalue}}{\vrootOf{\overline{\vtree}}}}}{\vtree'}
+\end{array}
+}{
+\bsopsem{\deviceId}{\Trees}{\senstate}{\e(\overline{\e})}{\mkvt{\vrootOf{\vtree'}}{\vtree,\overline{\vtree},\vroot^\funvalue(\vtree')}}
+}
+\end{array}
+\end{array}$
+}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{\FKotac}
+\begin{block}{Operational Semantics (3)}
+ \scalebox{0.85}{
+ $\begin{array}{l}
+%%%  EVALUATION RULES
+\textbf{Rules for expression evaluation:} \hspace{4.4cm} %\hfill
+%\vspace{-0.2cm}
+  \boxed{\bsopsem{\deviceId}{\Trees}{\senstate}{\e}{\vtree}}
+\skiptransition%[-5pt]
+\begin{array}{c}
+\surfaceTyping{E-NBR}{
+         \qquad
+     \Trees_1=\piIof{1}{\Trees} \qquad
+     \bsopsem{\deviceId}{\Trees_1}{\senstate}{\e}{\vtree_1}
+\qquad
+ \fvalue=\mapupdate{\vrootOf{\Trees_1}}{\envmap{\deviceId}{\vrootOf{\vtree_1}}}
+ }{
+\bsopsem{\deviceId}{\Trees}{\senstate}{\nbrK\{\e\}}{\mkvt{\fvalue}{\vtree_1}}
+}
+\skiptransition\\[-6pt]
+\surfaceTyping{E-REP}{
+        \quad
+        \begin{array}{l}
+     \bsopsem{\deviceId}{\piIof{1}{\Trees}}{\senstate}{\e_1}{\vtree_1} \\
+     \bsopsem{\deviceId}{\piIof{2}{\Trees}}{\senstate}{\applySubstitution{\e_2}{\substitution{\xname}{\lvalue_0}}}{\vtree_2}~~
+        \end{array}
+        \quad
+        \lvalue_0 \! = \!\left\{\begin{array}{ll}
+                             \vrootOf{\piIof{2}{\Trees}}(\deviceId) & \mbox{if} \;  \deviceId \in \domof{\Trees} \\
+                             \vrootOf{\vtree_{1}} & \mbox{otherwise}
+                           \end{array}\right.
+ }{
+\bsopsem{\deviceId}{\Trees}{\senstate}{\repK(\e_1)\{(\xname) \; \ftoSym \; \e_2\}}{\mkvt{\vrootOf{\vtree_{2}}}{\vtree_1,\vtree_2}}
+}
+\skiptransition\\[-4pt]
+\surfaceTyping{E-SHARE}{ \qquad
+	\begin{array}{l@{\hspace{0.5em}}l}
+     \bsopsem{\deviceId}{\piIof{1}{\Trees}}{{\senstate}}{\e_1}{\vtree_1} & \fvalue' = \vrootOf{\piIof{2}{\Trees}} 
+      \qquad \qquad \fvalue = (\envmap{\deviceId}{\vrootOf{\vtree_1}})[\fvalue']
+     \\
+     \bsopsem{\deviceId}{\piIof{2}{\Trees}}{{\senstate}}{\applySubstitution{\e_2}{\substitution{\xname}{\fvalue}}}{\vtree_2} %& \fvalue = (\envmap{\deviceId}{\vrootOf{\vtree_1}})[\fvalue']
+	\end{array}
+	\!\!\!\!
+ }{
+	\bsopsem{\deviceId}{\Trees}{\senstate}{\shareK(\e_1)\{(\xname) \; \ftoSym \; \e_2\}}{\mkvt{\vrootOf{\vtree_{2}}}{\vtree_1,\vtree_2}}
+}
+\end{array}
+\end{array}$
+}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{\FKotac}
+\begin{block}{Typing (1)}
+\centering
+ \scalebox{0.8}{
+ $\begin{array}{l}
+%%%  TYPES
+\textbf{Types:}\\
+\begin{array}{rcl@{\hspace{4.5cm}}r}
+\type & \BNFcce &  \tvar  \; \BNFmid \;  \builtintype \; \BNFmid \;  (\overline\type) \rightarrow \type  \; \BNFmid \; \ftypeOf{\builtintype}       &   {\footnotesize \mbox{type}} \\
+%
+\builtintype & \BNFcce & \bvar\; \BNFmid \;  \bitype &   {\footnotesize \mbox{built-in type}} \\
+%
+\typescheme & \BNFcce &  \forall\overline{\tvar}\overline{\bvar}.\type      &   {\footnotesize \mbox{type scheme}} \\
+%
+\hline\\[-8pt]
+\tctx & \BNFcce &  \aann \; \BNFmid \;  \sann &   {\footnotesize \mbox{context}} \\[8pt]
+%
+%\localenv & \BNFcce & \envS{\senstate}{\overline\vtree} &   {\footnotesize \mbox{local environment}} \\
+\end{array}\\
+\hline\\[-8pt]
+%%%  TYPE RULES
+\textbf{Expression typing:} 
+  \hfill
+  \boxed{\expTypJudC{\tctx}{\TStypEnv}{\TtypEnv}{\e}{\type}}
+\vspace{0.1cm}
+  \\
+\begin{array}{c}
+\surfaceTyping{T-ATOS}{ \quad
+\expTypJudC{\aann}{\TStypEnv}{\TtypEnv}{\e}{\builtintype}
+}{
+\expTypJudC{\sann}{\TStypEnv}{\TtypEnv}{\e}{\builtintype}
+}
+\qquad
+\surfaceTyping{T-STOA}{ \quad
+\expTypJudC{\sann}{\TStypEnv}{\TtypEnv}{\e}{\builtintype}
+}{
+\expTypJudC{\aann}{\TStypEnv}{\TtypEnv}{\e}{\builtintype}
+}
+\skiptransition
+%
+\nullsurfaceTyping{T-VAR}{
+\expTypJudC{\tctx}{\TStypEnv}{\TtypEnv,\xname:\type}{\xname}{\type}
+}
+\skiptransition
+%
+{
+\surfaceTyping{T-DAT}{ \quad
+\applySubstitution{\applySubstitution{\type'}{\substitution{\overline\tvar}{\overline\type''}}}{\substitution{\overline\bvar}{\overline\builtintype}} = (\overline{\type})\rightarrow\type
+\qquad
+\expTypJudC{\tctx}{\TStypEnv}{\TtypEnv}{\overline{\lvalue}}{\overline{\type}}
+}{
+\expTypJudC{\tctx}{\TStypEnv,\dc: \forall \overline{\tvar}\overline{\bvar}. \type'}{\TtypEnv}{\dc(\overline{\lvalue})}{\type} }
+}
+\end{array}
+\end{array}$}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{\FKotac}
+\begin{block}{Typing (2)}
+ \scalebox{0.8}{
+ $\begin{array}{l}
+\textbf{Expression typing:} 
+  \hfill
+  \boxed{\expTypJudC{\tctx}{\TStypEnv}{\TtypEnv}{\e}{\type}}
+\vspace{0.1cm}
+  \\
+\begin{array}{c}
+\surfaceTyping{T-A-AFUN}{ \quad
+\expTypJudC{\aann}{\TStypEnv}{\;\TtypEnv,\,\overline{\xname}:\overline{\type}}{\e}{\type}
+}{ \expTypJudC{\aann}{\TStypEnv}{\TtypEnv}{ (\overline{\xname}) \; \toSym{\name}{\{\alignK\{\e\}\}}}{(\overline{\type})\rightarrow\type}}
+%
+\skiptransition
+%
+\surfaceTyping{T-A-SFUN}{ \quad
+\expTypJudC{\sann}{\TStypEnv}{\;\TtypEnv,\,\overline{\xname}:\overline{\type}}{\e}{\type}
+}{ \expTypJudC{\sann}{\TStypEnv}{\TtypEnv}{ (\overline{\xname}) \; \ftoSym \{\e\}}{(\overline{\type})\rightarrow\type}}
+%
+\skiptransition
+%
+{
+\surfaceTyping{T-N-AFUN}{ \quad
+\mbox{$\afunvalue$ is a (built-in or declared) aggregate function}}{
+\expTypJudC{\aann}{\TStypEnv,\afunvalue: \forall \overline{\tvar}\overline{\bvar}. \type}{\TtypEnv}{\afunvalue}{\applySubstitution{\applySubstitution{\type}{\substitution{\overline\tvar}{\overline\type}}}}{\substitution{\overline\bvar}{\overline\builtintype}} }
+}
+%
+\skiptransition
+%
+{
+\surfaceTyping{T-N-SFUN}{ \quad
+\mbox{$\sfunvalue$ is a (built-in or declared) standard function}}{
+\expTypJudC{\sann}{\TStypEnv,\sfunvalue: \forall \overline{\tvar}\overline{\bvar}. \type}{\TtypEnv}{\sfunvalue}{\applySubstitution{\applySubstitution{\type}{\substitution{\overline\tvar}{\overline\type}}}}{\substitution{\overline\bvar}{\overline\builtintype}} }
+}
+%
+\skiptransition
+%
+\surfaceTyping{T-APP}{ \quad
+\expTypJudC{\tctx}{\TStypEnv}{\TtypEnv}{\e}{(\overline{\type})\rightarrow\type} \qquad
+\expTypJudC{\tctx}{\TStypEnv}{\TtypEnv}{\overline{\e}}{\overline{\type}} }{
+\expTypJudC{\tctx}{\TStypEnv}{\TtypEnv}{\e(\overline{\e})}{\type} }
+%
+\skiptransition
+%
+%\surfaceTyping{T-BRANCH}{ \qquad
+%\expTypJud{\TStypEnv}{\TtypEnv}{\e_1}{\btype}
+%\quad \expTypJud{\TStypEnv}{\TtypEnv}{\e_2}{\type}
+%\quad \expTypJud{\TStypEnv}{\TtypEnv}{\e_3}{\type} }{
+%\expTypJud{\TStypEnv}{\TtypEnv}{\ifK(\e_1) \{\e_2\} \{\e_3\} }{\type} }
+%%
+%\skiptransition
+%%
+\surfaceTyping{T-REP}{ \qquad
+\expTypJudC{\aann}{\TStypEnv}{\TtypEnv}{\e_1}{\builtintype}
+\qquad \expTypJudC{\aann}{\TStypEnv}{\TtypEnv,\xname:\builtintype}{\e_2}{\builtintype} }{
+\expTypJudC{\aann}{\TStypEnv}{\TtypEnv}{\repK(\e_1)\{(\xname) \ftoSym \e_2\}}{\builtintype} }
+%
+\qquad\qquad
+%
+\surfaceTyping{T-NBR}{ \qquad
+\expTypJudC{\aann}{\TStypEnv}{\TtypEnv}{\e}{\builtintype}
+}{ \expTypJudC{\aann}{\TStypEnv}{\TtypEnv}{\nbrK\{\e\}}{\ftypeOf{\builtintype}} }
+%
+\skiptransition
+%
+\surfaceTyping{T-SHARE}{ \qquad
+\expTypJudC{\aann}{\TStypEnv}{\TtypEnv}{\e_1}{\builtintype}
+\qquad \expTypJudC{\aann}{\TStypEnv}{\TtypEnv,\xname:\ftypeOf{\builtintype}}{\e_2}{\builtintype} }{
+\expTypJudC{\aann}{\TStypEnv}{\TtypEnv}{\shareK(\e_1)\{(\xname) \ftoSym \e_2 \}}{\builtintype} }
+%
+\skiptransition
+%
+\end{array}
+\end{array}$}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{\FKotac}
+\begin{block}{Typing (3)}
+\centering
+ \scalebox{0.85}{
+ $\begin{array}{l}
+\textbf{Function typing:} 
+  \hfill
+  \boxed{\funTypJud{\TStypEnv}{\FUNCTION}{\typescheme}}
+  \\
+\begin{array}{c}
+%
+\surfaceTyping{T-AFUNCTION}{
+\qquad
+\expTypJudC{\aann}{\TStypEnv,\,\afname:\forall\emptyseq.(\overline{\type})\rightarrow\type}{\overline{\xname}:\overline{\type}}{\e}{\type}
+\qquad
+\overline{\tvar}\overline{\bvar}=\FTV{(\overline{\type})\rightarrow\type}
+}{ \funTypJud{\TStypEnv}{\funK \; \afname (\overline{\xname}) \; \{ \alignK{\{\e\}} \}}{\forall\overline{\tvar}\overline{\bvar}.(\overline{\type})\rightarrow\type}}
+%
+\skiptransition
+%
+%
+\surfaceTyping{T-SFUNCTION}{
+\qquad
+\expTypJudC{\sann}{\TStypEnv,\,\sfname:\forall\emptyseq.(\overline{\type})\rightarrow\type}{\overline{\xname}:\overline{\type}}{\e}{\type}
+\qquad
+\overline{\tvar}\overline{\bvar}=\FTV{(\overline{\type})\rightarrow\type}
+}{ \funTypJud{\TStypEnv}{\funK \; \sfname (\overline{\xname}) \; \{ \e\}}{\forall\overline{\tvar}\overline{\bvar}.(\overline{\type})\rightarrow\type}}
+%
+\skiptransition
+%
+\end{array}
+\\
+\textbf{Program typing:} 
+  \hfill
+  \boxed{\proTypJud{\PROGRAM}{\type}}
+  \\
+\begin{array}{c}
+%
+\surfaceTyping{T-PROGRAM}{
+\\
+\TStypEnv_0=\OStypEnv
+\\
+\FUNCTION_i = \funK \; \fname_i (\_) \; \feqSymK{\_}
+\qquad
+\funTypJud{\TStypEnv_{i-1}}{\FUNCTION_i}{\typescheme_i}
+\qquad
+\TStypEnv_i=\TStypEnv_{i-1},\, \fname_i:\typescheme_i
+\qquad
+ (i \in 1..n)
+\\
+\expTypJudC{\aann}{\TStypEnv_n}{\emptyset}{\e}{\type}
+}{ \proTypJud{\FUNCTION_1\cdots\FUNCTION_n  \;
+\e}{\type}}
+\end{array}
+\end{array}$}
+\end{block}
+\end{frame}
+
+\end{document}

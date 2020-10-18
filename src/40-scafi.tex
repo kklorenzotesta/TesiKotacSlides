@@ -1,0 +1,52 @@
+Scafi \cite{Scafi, scafiphd} is a library defining a Domain Specific Language that integrates the aggregate paradigm into the Scala programming language \cite{Scala}. Like Protelis it runs on the Java Virtual Machine but instead of defining its own language it take advantage of the Scala language and its expressive type system. Scafi unlike the others aggregate programming implementation doesn't have an explicit representation of fields but instead has a notion of "computation against a neighbour", i.e. a computation depending on the evaluation of the same expression by an alligned neighbour. This difference aims to provide an embedding of field computations into Scala more close to the host language. It also provides an integration with Akka \cite{Akka}, a Scala industry-ready actor framework for scalable and resilient message-driven applications.
+
+Scafi is an \textit{internal DSL} which means it provides its API on top of the host programming language, unlike Protelis which is an \textit{external DSL}, offering a standalone language. This means that developers doesn't need to learn a new language and the Scafi mantainers don't need to develop editing tools reusing instead the ones for the Scala language. There is also experimental evidence that Protelis programs require to delegate a significant part of the code to Java methods for code reuse or simplicity. This increases the complexity of development since the code in both languages must be keep coordinated.
+
+\begin{figure}[t]
+\begin{lstlisting}[language={scafi},frame=single]
+trait Constructs {
+  // Key constructs
+  def rep[A](init: => A)(fun: (A) => A): A
+  def foldhood[A](init: => A)(aggr: (A, A) => A)(expr: => A): A
+  def nbr[A](expr: => A): A
+  def @@[A](b: => A): A
+
+  // Abstract types
+  type ID
+  type LSNS, NSNS
+
+  // Contextual, but foundational
+  def mid(): ID
+  def sense[A](name: LSNS): A
+  def nbrvar[A](name: NSNS): A
+}
+\end{lstlisting}
+\caption{Scafi constructs from \cite{Scafi}}\label{fig:scaficonstructs}
+\end{figure}
+
+A Scafi program is a function that extends an implementation of the trait $\mathtt{Constructs}$, visible in figuera \ref{fig:scaficonstructs}, which provides all the aggregate programming basic constructs. 
+
+The method $\mathtt{rep}[\mathtt{A}](\mathtt{init}: \texttt{=>} \mathtt{A})(\mathtt{fun}: (\mathtt{A}) \texttt{=>} \mathtt{A}): \mathtt{A}$ implements a $\mathtt{rep}$-expression of the field calculus, returning a value of type $\mathtt{A}$. $\mathtt{init}$ is a lazy expression computing the beginning value. At each round the $\mathtt{fun}$ unary function is applied to compute the new returned value from the last value.
+
+The method $\mathtt{fooldhood}[\mathtt{A}](\mathtt{init}: \texttt{=>} \mathtt{A})(\mathtt{aggr}: (\mathtt{A},\mathtt{A}) \texttt{=>} \mathtt{A})](\mathtt{expr}: \texttt{=>} \mathtt{A}): \mathtt{A}$ provides a way to extract and combine information from neightbours. First the lazy expression $\mathtt{expr}$ is computed against each aligned neighbour, each computation producing a value of type $\mathtt{A}$. Then the results are combined into a single value using the associative binary function $\mathtt{aggr}$ with his neutral element $\mathtt{init}$.
+
+The method $\mathtt{nbr}[\mathtt{A}](\mathtt{expr}: \texttt{=>} \mathtt{A}): \mathtt{A}$ defines a neightbour dependent expression that return a value of type $\mathtt{A}$. The result is computed by the lazy expression $\mathtt{expr}$ when evaluated against the local device. When evaluated against a neightbouring device it returns instead the most recent value of $\mathtt{expr}$ computed by that device.
+
+The method $@@[\mathtt{A}](\mathtt{b}: \texttt{=>} \mathtt{A}): \mathtt{A}$ is a function that performs an alignment, allowing to perform branching in the execution. Inside the body $\mathtt{b}$ only the neightbours executing the same body are considered aligned. For example the $\mathtt{branch}$ method $\mathtt{branch}[\mathtt{A}](\mathtt{cond}: \mathtt{Boolean})(\mathtt{th}: \texttt{=>} \mathtt{A})(\mathtt{el}: \texttt{=>} \mathtt{A}): \mathtt{A}$, corresponding to the $\mathtt{if}$ in the field calculus, is defined as $\mathtt{mux}(\mathtt{cond})(()\toSymK{\mathtt{th}})(()\toSymK{\mathtt{el}})()$ where $\mathtt{mux}$ is an eagerly evaluated version of the Scala $\mathtt{if}$.
+
+Finally $\mathtt{mid}$ returns the unique identifier, of the abstract type $\mathtt{ID}$, of the running device, $\mathtt{sense}$ reads from the local sensor named $\mathtt{name}$, of the abstract type $\mathtt{LSNS}$, its current value of type $\mathtt{A}$ and $\mathtt{nbrvar}$ reads from a neighbouring sensor named $\mathtt{name}$ (a sensor of the running device which value dependens on the neighbour against which is currently computing), of the abstract type $\mathtt{NSNS}$, its current value of type $\mathtt{A}$. The device temperature or GPS position are examples of local sensors, while the distance from a neighbour is an example of neighbouring sensor.
+
+\begin{figure}[t]
+\begin{lstlisting}[language={scafi},frame=single,emph={count, maxh}]
+def count(): Int = { rep(0){ x => x + 1} }
+def countNeighbours(): Int = {
+  foldhood(0)(_ + _)(1)
+}
+def maxh(field: Double): Double = { 
+  foldhood(Double.NegativeInfinity)(Math.max(_,_)){ nbr(field) } 
+}
+\end{lstlisting}
+\caption{Examples of Scafi programs}\label{fig:scafiexample}
+\end{figure}
+
+Figure \ref{fig:scafiexample} shows some example of Scafi programs. The first function $\mathtt{count}$ counts the number of rounds executed by the device. The function $\mathtt{countNeighbours}$ counts how many neighbours has the device, simply by adding one for each device. The function $\mathtt{maxh}$ returns the maximum value $\mathtt{field}$ with which is called acroos neighbours. This is accomplished by calling $\mathtt{nbr}$ against each neighbour and combining the values by the Scala $\mathtt{Math.max}$ function.

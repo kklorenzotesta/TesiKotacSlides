@@ -1,0 +1,348 @@
+% DEPENDENCIES
+\RequirePackage{amsmath,amssymb,amsthm}
+%\RequirePackage{amsthm}
+\RequirePackage{mlrules}
+\RequirePackage{titlesec}
+\RequirePackage{graphicx}
+\RequirePackage{stmaryrd}
+\RequirePackage{listings}
+\RequirePackage{color}
+\RequirePackage{url}
+\RequirePackage{caption}
+\RequirePackage{subcaption}
+\RequirePackage{xparse}
+\RequirePackage{float}
+\RequirePackage{tikz}
+\RequirePackage{rotating}
+\RequirePackage{pdflscape}
+\RequirePackage{stackengine}
+\usetikzlibrary{calc,trees,arrows,arrows.meta,positioning,matrix,fit,%
+  decorations.pathmorphing,decorations.markings,tikzmark,automata,petri,angles}
+
+\RequirePackage{lmodern}
+\RequirePackage{adjustbox}
+\RequirePackage{forest}
+
+\RequirePackage[utf8]{inputenc}
+\RequirePackage[babel,autostyle=try]{csquotes}
+\RequirePackage{amsfonts}
+%\RequirePackage{mathabx}
+\RequirePackage[framemethod=TikZ]{mdframed}
+%\RequirePackage{makeidx}
+\RequirePackage{geometry}
+\RequirePackage{mathtools}
+\RequirePackage{booktabs}
+\RequirePackage{soul}
+\RequirePackage{fancyhdr}
+\RequirePackage{ifthen}
+% WHEN HAVE APPENDIX
+\newif\ifappendix
+\appendixtrue
+
+
+\ifappendix
+ \newcommand{\refapp}{the appendix}
+\else
+ \newcommand{\refapp}{\cite[Appendix]{TR}}
+\fi
+
+%
+
+\let\name\textttreal
+\let\biglor\bigvee
+
+
+% Basic notations
+\newcommand{\emptyseq}{\emptyset}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ACRONYMS
+\mlrules@definesimplemacros{}{}{FJ,IFJ,SPL,FOP,DOP,SPLM,FM,CK,AB,ABS}
+\mlrules@definemacros{}{}{IFDJ/{IF$\Delta$J}}
+
+\mlrules@definesimplemacros{}{\textrmreal}{FSL,iFSL}
+\mlrules@definemacros{}{\textrmreal}{FDSL/{F$\Delta$SL},iFDSL/{iF$\Delta$SL}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% STATECHARTS
+
+\mlrules@definemacros{SetName}{}{State/{S},Edge/{T},Event/{E},Operation/{O},Interface/{I},Region/{R}}
+
+\mlrules@definemacros{name}{}{state/{\name s},transition/{\name t},event/{\name e},d/{\name d},operation/{\name{op}},p/{\name p},interface/{\name I},region/{r}}
+\mlrules@definemacros{el}{\textitreal}{state/{SD},transition/{TD},destination/{dest},rdestination/{rdest},%
+                                       optevent/{event},optguard/{guard},optaction/{action},%
+                                       interface/{I},operation/{o},guard/{g},effect/{eff},specification/{ID},declaration/{D},region/{R},declarationtable/{DT},%
+                                       statebehavior/{SB},trigger/{trigger}}
+\mlrules@definemacros{elstatekind}{\textttreal}{{}/{k},simple/{simple},sync/{sync}}
+\mlrules@definemacros{history}{\textitreal}{shallow/{\textsc{sh}},deep/{\textsc{dh}}}
+\mlrules@definemacros{special}{\textitreal}{always/{\textbfreal{always}},true/{\textbfreal{true}},none/{\textbfreal{none}}}
+\let\elevent\nameevent
+\let\namedelta\named
+\newcommand{\el}{N}
+\newcommand{\elproduct}{\mathit{p}}
+
+
+% Core
+\newcommand{\defstatebasic}[1]{#1}
+
+\def\statechart@defstatebasic@simple#1#2{#1(#2)}
+\def\statechart@defstatebasic@long*#1#2#3{#1(#2, #3)}
+\DeclareRobustCommand\defstatebasic{\@ifnextchar*{\statechart@defstatebasic@long}{\statechart@defstatebasic@simple}}
+
+
+\def\statechart@defstatecomposite@simple*#1#2#3#4{#1(#2,#3,#4)}
+\def\statechart@defstatecomposite@long#1#2#3#4#5{#1(#2,#3,#4,#5)}
+\DeclareRobustCommand\defstatecomposite{\@ifnextchar*{\statechart@defstatecomposite@simple}{\statechart@defstatecomposite@long}}
+
+\def\statechart@defstateGcomposite@simple*#1#2#3#4#5{#1(#2,#3,#4,#5)}
+\def\statechart@defstateGcomposite@long#1#2#3#4#5#6{#1(#2,#3,#4,#5,#6)}
+\DeclareRobustCommand\defstateGcomposite{\@ifnextchar*{\statechart@defstateGcomposite@simple}{\statechart@defstateGcomposite@long}}
+
+\def\statechart@deftransition@simple#1#2#3{#1(#2, #3)}
+\def\statechart@deftransition@long*#1#2#3#4#5{#1(#2\ [#3]\ /\ #4, #5)}
+\DeclareRobustCommand\deftransition{\@ifnextchar*{\statechart@deftransition@long}{\statechart@deftransition@simple}}
+
+% Action
+\mlrules@definesimplemacros{kw}{\textbfreal}{interface,event,operation,integer,boolean,string,void,entry,every,exit,always}
+\newcommand{\definterface}[2]{\kwinterface\ {#1}:{#2}}
+\newcommand{\defevent}[1]{\kwevent\ {#1}}
+\newcommand{\defoperation}[3]{\kwoperation\ {#1}({#2}):{#3}}
+
+
+% Concurrency
+\newcommand{\defregion}[3]{#1(#2,#3)}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% DELTAS
+
+\mlrules@definesimplemacros{kw}{\textbfreal}{delta,adds,removes,modifies,state,region,transition,initial,final,rdestination,destination,guard,effect,def,action,in}
+\mlrules@definemacros{g}{\textitreal}{name/{name},names/{names},core/{base}}
+\newcommand{\deltaapp}{\,\bullet\,}
+%\NewDocumentCommand{\reduce}{o}{\IfNoValueTF{#1}{\;\triangleright\;}{\;\triangleright_{#1}\;}}
+\NewDocumentCommand{\reduce}{o}{\IfNoValueTF{#1}{\;\rightarrow\;}{\;\rightarrow_{#1}\;}}
+\newcommand{\setNames}{\mathcal{S}}
+
+\newcommand{\defdelta}[2]{\kwdelta\ {#1}\ \{\ {#2}\ \}}
+
+% 2. Name categories
+\newcommand{\categories}{Class/C,Field/F,Method/M,Delta/D,ExtendDelta/K,FS/{FS},MS/{MS}}
+\mlrules@definecategories{\categories}
+\mlrules@definemacros{Names}{}{Feature/{\vect{\varphi}}}
+\mlrules@definemacros{name}{}{feature/\varphi,T/T,Ref/{\rho},predicate/{{p}}}
+
+
+
+% Core
+\newcommand{\addsstate}[1]{\kwadds\ {#1}}
+\newcommand{\removesstate}[1]{\kwremoves\  {#1}}
+\newcommand{\modifiesstate}[2]{\kwmodifies\ {#1}\ \{{#2}\}}
+\newcommand{\replacestateinit}[1]{\kwinitial\ {#1}}
+\newcommand{\replacestatefinal}[1]{\kwfinal\ {#1}}
+\newcommand{\addstransition}[1]{\kwadds\  {#1}}
+\newcommand{\removestransition}[1]{\kwremoves\  {#1}}
+\newcommand{\modifiestransition}[2]{\kwmodifies\  {#1}\ \{{#2}\}}
+
+\newcommand{\replacedestination}[1]{\kwdestination\ {#1}}
+\newcommand{\replacerdestination}[1]{\kwrdestination\ {#1}}
+\newcommand{\replaceevent}[1]{\kwevent\ {#1}}
+
+% Action
+\newcommand{\replaceguard}[1]{\kwguard\ {#1}}
+\newcommand{\replaceeffect}[1]{\kwaction\ {#1}}
+
+\newcommand{\addsinterface}[1]{\kwadds\ \kwinterface\ {#1}}
+\newcommand{\removesinterface}[1]{\kwremoves\ \kwinterface\ {#1}}
+\newcommand{\modifiesinterface}[2]{\kwmodifies\ \kwinterface\ {#1}\ \{{#2}\}}
+
+\newcommand{\addsoperation}[1]{\kwadds\ #1}
+\newcommand{\removesoperation}[1]{\kwremoves\ #1}
+\newcommand{\addsevent}[1]{\kwadds\ \kwevent\ #1}
+\newcommand{\removesevent}[1]{\kwremoves\ #1}
+
+% Concurrency
+\newcommand{\addsregion}[1]{\kwadds\ #1}
+\newcommand{\removesregion}[1]{\kwremoves\ #1}
+\newcommand{\modifiesregion}[2]{\kwmodifies\ #1\ \{{#2}\}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SYNTAX
+\mlrules@definemacros{se}{\textitreal}{e/{exp}}
+\mlrules@definesimplemacros{se}{\textitreal}{PO,SO,SMO,TO,TMO,DO,IO,RO}
+
+\mlrules@definesimplemacros{se}{\textitreal}{FM,CK,AB}
+\mlrules@definemacros{se}{\textitreal}{PFSL/{P},LFDSL/{L}}
+\mlrules@definemacros{se}{\ensuremath}{FMF/{\mathcal{F}},CKO/{<},notCKO/{\not<},CKM/{\alpha},Formula/{\Psi},DMD/{\Delta},FMD/{\Pi}}
+\let\eldelta\seDMD
+\let\emptypath\emptyset
+\newcommand{\ispt}{\mathit{pt}}
+\newcommand{\elpathoption}{\omega}
+\newcommand{\elkindoption}{\varsigma}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ANALYSIS
+
+% Delta Consistency
+\mlrules@definemacros{g}{\textitreal}{references/{refs}}
+\mlrules@definemacros{fun}{\textitreal}{requirespresent/{rpresent},requiresabsent/{rabsent}}
+
+
+% Core
+\let\element\eta
+\let\elreference\rho
+\let\eldependency\delta
+\let\eldependencyoptional\upsilon
+\let\nodepchange\iota
+\mlrules@definemacros{fun}{\textitreal}{adds/{fadds},removes/{fremoves},modifies/{fmodifies},dependencies/{fdependencies}}
+\mlrules@definemacros{pred}{\textttreal}{present/{present},absent/{absent},dependencies/{dependencies},applicability/{ac},dependency/{dc},applicabilitydependency/{adc}}
+\mlrules@definemacros{g}{\textitreal}{namestate/{name}}
+\mlrules@definemacros{g}{\textitreal}{nameregion/{region}}
+\mlrules@definemacros{p}{\textttreal}{coreconstraint/{FMandDA}}
+\mlrules@definemacros{predcheck}{\textttreal}{adds/{padds},removes/{premoves},modifies/{pmodifies},dependencies/{pdeps},orthogonal/{portho},include/{pinclude}}
+
+% Action
+\let\setnamedep\Phi
+\mlrules@definemacros{namedep}{\textttreal}{endency/{dep},initial/{initial},exit/{exit},event/{event},guard/{guard},action/{action},statebehavior/{sb}}
+\mlrules@definemacros{elkind}{\mathfrak}{{}/{b},statebasic/{b},statecomposite/{c},transition/{t},unchecked/{u}}
+
+% Concurrency
+
+
+% 4. Notations for Definitions
+\mlrules@definesimplemacros{g}{\textttreal}{features,order,bind,FCST}
+\mlrules@definemacros{g}{\textttreal}{formula/{products},deltacondition/{activation},act/{FMandCK},dependency/{dependency},removes/{removes}}
+
+% 4.1. Basic data extraction
+
+
+\newcommand{\subtype}{{<}{:}}
+\newcommand{\issubtof}{\mathrel{\subtype}}
+\newcommand{\isssubtof}{\mathrel{{\lneq}{:}}}
+\newcommand{\after}{{<_{\scriptsize \seLFDSL}}}
+\newcommand{\isbefore}{\mathrel{\after}}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\tikzset{
+ start/.style={circle, minimum width=3pt, fill=black},
+ region/.style={draw=black!60},
+ state/.style={draw, rounded corners=3pt, minimum height=1.5em, text width=#1, align=center},
+ state/.default=3cm,
+ choice/.style={draw, diamond, minimum width=2pt},
+ final/.style={circle, draw, line width=.5pt, minimum width=3pt, accepting},
+ spec/.style={midway, sloped, scale=.8, anchor=south},
+ node distance=10pt and .9cm,
+ >=stealth
+}
+
+\def\statechart@tikz@finit{\node[}
+\NewDocumentCommand{\tikzstate}{o d() m g g}{
+  \IfNoValueTF{#1}{\def\statechart@tikz@option{state}}{\def\statechart@tikz@option{state,#1}}
+  \IfNoValueTF{#2}{\def\statechart@tikz@position{}}{\def\statechart@tikz@position{at (#2) }}
+  \IfNoValueTF{#4}{\def\statechart@tikz@title{}}{\def\statechart@tikz@title{{\bf #4}\\~}}
+  \IfNoValueTF{#5}{\def\statechart@tikz@text{~}}{\def\statechart@tikz@text{#5}}
+  \def\statechart@tikz@fall{\expandafter\statechart@tikz@finit\statechart@tikz@option] (#3) }
+\expandafter\statechart@tikz@fall\statechart@tikz@position {\statechart@tikz@title\statechart@tikz@text}
+}
+
+\NewDocumentCommand{\tikzstatetitle}{o d() m m}{
+  \IfNoValueTF{#1}{\def\statechart@tikz@option{}}{\def\statechart@tikz@option{#1}}
+  \IfNoValueTF{#2}{\def\statechart@tikz@position{}}{\def\statechart@tikz@position{at (#2) }}
+  \def\statechart@tikz@fall{\expandafter\statechart@tikz@finit\statechart@tikz@option] (#3) }
+\expandafter\statechart@tikz@fall\statechart@tikz@position {{\bf #4}}  
+}
+
+\NewDocumentCommand{\tikzstateSH}{o d() g}{
+  \IfNoValueTF{#1}{\def\statechart@tikz@option{circle,fill=black,text=white,inner sep=1pt,outer sep=0pt}  }{%
+     \def\statechart@tikz@option{circle,fill=black,text=white,inner sep=1pt,outer sep=0pt,#1}}
+  \IfNoValueTF{#2}{\def\statechart@tikz@position{}}{\def\statechart@tikz@position{at (#2) }}
+  \IfNoValueTF{#3}{%
+    \def\statechart@tikz@fall{\expandafter\statechart@tikz@finit\statechart@tikz@option]} }{%
+    \def\statechart@tikz@fall{\expandafter\statechart@tikz@finit\statechart@tikz@option] (#3) } }
+\expandafter\statechart@tikz@fall\statechart@tikz@position {\scriptsize\tt\bf SH}  
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FUNCTIONS AND PREDICATE
+
+%\mlrules@definesimplemacros{fun}{\textitreal}{name,prefix,prefixes,paths,getstate,getactive,desactivate,activate}
+%\mlrules@definemacros{}{\textitreal}{wf/{wf},isactive/{active}}
+%\let\reduce\blacktriangleright
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% DELTAS
+
+
+%\mlrules@definemacros{el}{}{deltaoperation/{\omega},deltadata/{\delta},deltatriplet/{\pi}}
+%\mlrules@definemacros{elref}{}{state/{\namestate},transition/{\tau},container/{\varsigma}}
+
+%\newcommand{\reference}[2]{{#1}.{#2}}
+
+
+
+
+
+
+
+%\newcommand{\reftransition}[2]{{#1}[{#2}]}
+%\newcommand{\reftranscomponent}[3]{{#1}[{#2}.{#3}]}
+%\newcommand{\deltatriplet}[3]{(#1,#2,#3)}
+%\mlrules@definemacros{fun}{\textitreal}{metaadds/{fmadds},metaremoves/{fmremoves}}
+
+
+% Not used for now
+\lstdefinelanguage{Example}{
+  keywordstyle=\sf\bfseries,
+  morekeywords={interface, operation, event, delta, adds, removes, modifies, state, region, transition, final,
+   initial, rdestination, destination, guard, effect, def, action, in},%  morekeywords=\keywords,
+  fontadjust = true,
+  columns = fullflexible,
+  basicstyle=\sffamily,
+  %basicstyle=\scriptsize\sffamily,
+%  identifierstyle=\tt,
+  sensitive=false,
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]",
+  mathescape=true,
+}
+
+\lstset{language=Example}
+
+
+\lstdefinelanguage{mapping}{
+  keywordstyle=\sf\itshape,
+  morekeywords={fadds,fremoves,fmodifies},
+  keywordstyle={[2]\sf\bfseries},
+  morekeywords={[2]false,true},
+  fontadjust = true,
+  columns = fullflexible,
+  basicstyle=\sffamily,
+  mathescape=true,
+  literate={->}{{$\mapsto$}}1,
+}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ENVIRONMENTS
+%\newtheorem{lemma}{Lemma}
+%\newtheorem{theorem}{Theorem}
+%\newtheorem{definition}{Definition}
+%\newtheorem{example}{Example}
+%\newtheorem{remark}{Remark}
+%\newtheorem{notation}{Notation}
+%\newtheorem{property}{Property}
+
+\newtheorem{michael}{Michael's Comments}
+\newtheorem{Ferruccio}{Ferruccio's Comments}
+\newenvironment{TODO}{\bgroup\bf TODO:\ }{\egroup}
+
+\renewcommand{\definedas}{\triangleq}
+
