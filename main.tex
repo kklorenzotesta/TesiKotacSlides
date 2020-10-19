@@ -102,7 +102,7 @@ Formal language and model based on \textit{computational fields}.
 
 \begin{frame}[fragile]
 \frametitle{Field Calculus \small  [G. Audrito et al., ACM TOCL, 2019]}
-	\begin{block}{Example (Distribute version of Bellman-Ford algorithm}
+	\begin{block}{Example (Distribute version of Bellman-Ford algorithm)}
 \begin{lstlisting}[]
 def distanceTo(source) {
   rep (infinity) { (d) =>
@@ -266,7 +266,7 @@ fun AggregateContext.main(): Double = distanceTo(temperature() > 10)
         \hline \\[-6pt]
         \AFUNCTION & \BNFcce &  \funK \; \afname (\overline{\xname}) \; \{ \alignK{\{\aexp\}} \}
                                                                                                                                                                                                         &   {\footnotesize \mbox{aggregate function declaration}} \\[3pt]
-        \aexp & \BNFcce & \xname \, \BNFmid \, \anyvalue  \BNFmid \; (\overline{\xname}) \; \toSym{\color{red}{\name}}{\{\alignK\{\aexp\}\}} \, \BNFmid \, \aexp(\overline{\aexp}) \, \BNFmid \,  &   {\footnotesize \mbox{aggregate expression}} \\
+        \aexp & \BNFcce & \xname \, \BNFmid \, \anyvalue  \BNFmid \; (\overline{\xname}) \; \toSym{\color{red}{\name}\color{black}}{\{\alignK\{\aexp\}\}} \, \BNFmid \, \aexp(\overline{\aexp}) \, \BNFmid \,  &   {\footnotesize \mbox{aggregate expression}} \\
         && \repK(\aexp)\{ (\xname) \ftoSym \aexp \} \, \BNFmid \, \nbrK\{\aexp\} \, \BNFmid \, \shareK(\aexp)\{(\xname) \ftoSym \aexp \} \\[3pt]
                 \anyvalue & \BNFcce &  \lvalue \; \BNFmid \; \funvalue \; \BNFmid \; {\color{red} \fvalue}
                 &{ \mbox{\footnotesize value}}
@@ -276,7 +276,7 @@ fun AggregateContext.main(): Double = distanceTo(temperature() > 10)
                 \\[3pt]
                 {\color{red} \fvalue} & \BNFcce &  {\color{red} \envmap{\overline\deviceId}{\overline\lvalue}}
                 &{ \mbox{\footnotesize neighbouring field value}} \\
-        \afunvalue & \BNFcce & \abname \; \BNFmid \; \afname \; \BNFmid \; (\overline{\xname}) \; \toSym{\color{red}{\name}}{\{\alignK\{\aexp\}\}}
+        \afunvalue & \BNFcce & \abname \; \BNFmid \; \afname \; \BNFmid \; (\overline{\xname}) \; \toSym{\color{red}{\name}\color{black}}{\{\alignK\{\aexp\}\}}
                                                                                                                                                                                                         &   {\footnotesize\mbox{aggregate function value}} \\
 \end{array}
         $}
@@ -708,19 +708,34 @@ fun AggregateContext.main(): Double = distanceTo(temperature() > 10)
 
 \begin{frame}
 \frametitle{Bibliography}
-J. Beal, D. Pianini and M. Viroli, "Aggregate Programming for the Internet of Things," in \textit{Computer}, vol. 48, no. 9, pp. 22-30, Sept. 2015, doi: 10.1109/MC.2015.261.
+J. Beal, D. Pianini and M. Viroli (2015). Aggregate Programming for the Internet of Things. \textit{Computer}, vol. 48, no. 9, pp. 22-30, Sept. 2015, doi: 10.1109/MC.2015.261.
 
 \medskip
 
-M. Viroli, G. Audrito, F. Damiani, D. Pianini, and J. Beal. A higher-order calculus of computational fields. \textit{ACM Transactions on Computational Logic}, 20, 10 2016.
+M. Viroli, G. Audrito, F. Damiani, D. Pianini, and J. Beal (2019). A higher-order calculus of computational fields. \textit{ACM Transactions on Computational Logic}, 20, 10 2019.
 
 \medskip
 
-Casadei, Roberto  (2020) Engineering Self-Adaptive Collective Processes for Cyber-Physical Ecosystems, [Dissertation thesis], Alma Mater Studiorum Università di Bologna.  Dottorato di ricerca in Computer science and engineering, 32 Ciclo. DOI 10.6092/unibo/amsdottorato/9380.
+C. Roberto (2020). Engineering Self-Adaptive Collective Processes for Cyber-Physical Ecosystems, Dissertation thesis, Alma Mater Studiorum Università di Bologna.  Dottorato di ricerca in Computer science and engineering, 32 Ciclo. DOI 10.6092/unibo/amsdottorato/9380.
 
 \medskip
 
-Protelis: Practical Aggregate Programming, Danilo Pianini, Mirko Viroli, Jacob Beal, \textit{ACM Symposium on Applied Computing 2015}, April 2015.
+D. Pianini, M. Viroli, J. Beal (2015). Protelis: Practical Aggregate Programming. \textit{ACM Symposium on Applied Computing 2015}, April 2015.
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Field Calculus}
+	\begin{block}{Example (Distribute version of Bellman-Ford algorithm with share operator)}
+\begin{lstlisting}[]
+def distanceTo(source) {
+  share (infinity) { (d) =>
+    mux (source, 0, minHood(d + nbrDist()))
+  }
+}
+distanceTo(temperature() > 10)
+\end{lstlisting}
+\end{block}
 \end{frame}
 
 \end{document}
