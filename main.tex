@@ -4,7 +4,7 @@
 
 \begin{frame}
 \frametitle{Distributed systems}
-\begin{block}{Why distributed systems}
+\begin{block}{Which distributed systems}
 \begin{itemize}
 \item \textit{Internet of Things (IOT)}
 \item \textit{Edge computing}
@@ -22,7 +22,7 @@
 \end{frame}
 
 \begin{frame}
-\frametitle{Aggregate programming \small [Beal, J. Pianini, D. Viroli, M. (2015)]}
+\frametitle{Aggregate programming \small [J. Beal et al., IEEE Computer, 2015]}
 \begin{block}{Why aggregate programming}
 \begin{itemize}
 \item multi-platform framework
@@ -30,23 +30,41 @@
 \item high level of abstraction
 \item composable abstractions of behavior
 \item global specification of programs
-\item based on the \textit{field calculus}
 \end{itemize}
 \end{block}
 \end{frame}
 
 \begin{frame}
+\frametitle{Aggregate programming \small [J. Beal et al., IEEE Computer, 2015]}
+\begin{block}{Computational model}
+\begin{itemize}
+\item common program
+\item dynamic neighbouring relation
+\item asynchronous rounds
+\item each round:
+\begin{enumerate}
+\item gather messages from neighbours and sensors information
+\item evaluate program $\PROGRAM$
+\item store values and emit message to all neighbours
+\end{enumerate}
+\end{itemize}
+\end{block}
 \centering
-\frametitle{Aggregate programming layers \small [Beal, J. Pianini, D. Viroli, M. (2015)]}
+\medskip
+\includegraphics[width=0.2\linewidth]{imgs/dev-nei.png}
+\end{frame}
+
+
+\begin{frame}
+\centering
+\frametitle{Aggregate programming layers \small [J. Beal et al., IEEE Computer, 2015]}
 \includegraphics[height=7cm]{imgs/layers.pdf}
 \end{frame}
 
 \begin{frame}
-\frametitle{Field Calculus \small [Viroli, M. Audrito, G. Damiani, F. et al. (2016)]}
+\frametitle{Field Calculus \small [G. Audrito et al., ACM TOCL, 2019]}
 \begin{block}{}
 Formal language and model based on \textit{computational fields}.
-
-Network of devices executing a common program in asyncronous rounds.
 \end{block}
 \begin{block}{Syntax}
 \centering
@@ -59,9 +77,9 @@ Network of devices executing a common program in asyncronous rounds.
                 &{ \mbox{\footnotesize function declaration}}
                 \\[3pt]
                 \e & \BNFcce &  \xname \;\BNFmid\; \anyvalue \;\BNFmid\;  (\overline{\xname}) \toSym{\name} \e \; \BNFmid \; \e(\overline\e) \;\BNFmid\;  &{ \mbox{\footnotesize expression}} \\
-&& {\color{red} \fifK} (\e) \{\e\} {\color{red} \elseK} \{\e\} \;\BNFmid \; \\
                 && {\color{red} \nbrK}\{\e\} \;\BNFmid\; {\color{red} \repK}(\e)\{ (\xname) \ftoSym \e \} \; \BNFmid \; \\
-                && {\color{red} \shareK}(\e)\{(\xname) \ftoSym \e \}
+                && {\color{red} \shareK}(\e)\{(\xname) \ftoSym \e \} \;\BNFmid \; \\
+                && {\color{red} \fifK} (\e) \{\e\} {\color{red} \elseK} \{\e\} 
                 \\[3pt]
                 \anyvalue & \BNFcce &  \lvalue \; \BNFmid \; \fvalue
                 &{ \mbox{\footnotesize value}}
@@ -83,14 +101,15 @@ Network of devices executing a common program in asyncronous rounds.
 
 
 \begin{frame}[fragile]
-\frametitle{Field Calculus \small [Viroli, M. Audrito, G. Damiani, F. et al. (2016)]}
-	\begin{block}{Example}
+\frametitle{Field Calculus \small  [G. Audrito et al., ACM TOCL, 2019]}
+	\begin{block}{Example (Distribute version of Bellman-Ford algorithm}
 \begin{lstlisting}[]
 def distanceTo(source) {
   rep (infinity) { (d) =>
     mux (source, 0, minHood(nbr{d} + nbrDist()))
   }
 }
+distanceTo(temperature() > 10)
 \end{lstlisting}
 \end{block}
 \medskip
@@ -113,7 +132,7 @@ Library for aggregate programming in Kotlin (\Kotac{})
 
 \begin{frame}[fragile]
 \frametitle{Existing aggregate frameworks}
-\begin{block}{Protelis \small [Pianini, D. Montagna, S. Viroli, M. (2013)]}
+\begin{block}{Protelis \small [D. Pianini et al., ACM SAC'15] (https://protelis.github.io/)}
 \begin{multicols}{2}
 {Features:
 \begin{itemize}
@@ -134,21 +153,19 @@ Library for aggregate programming in Kotlin (\Kotac{})
 \begin{block}{Protelis example}
 \begin{lstlisting}[language={Protelis}]
 def distanceTo(source) {
-  rep (POSITIVE_INFINITY) { (d) =>
-     mux (source) {
-        0
-     } else { 
-        minHood(nbr(d) + nbrRange.apply())
-    }
+  rep(d <- Infinity) {
+    mux (source) { 0 }
+    else { minHood(nbr(d) + nbrRange) }
   }
 }
+distanceTo(temperature() > 10)
 \end{lstlisting}
 \end{block}
 \end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Existing aggregate frameworks}
-\begin{block}{\Scafi [Casadei, R. (2020)]}
+\begin{block}{\Scafi [R. Casadei, PhD Thesis 2020] (https://scafi.github.io/)}
 \begin{multicols}{2}
 {Features:
 \begin{itemize}
@@ -159,8 +176,8 @@ def distanceTo(source) {
 }
 {Limitations:
 \begin{itemize}
-\item No field calculus semantics
-\item Computation against a neighbour
+\item No field calculus semantics (computation against a neighbour)
+\item[\vspace{\fill}]
 \end{itemize}
 }
 \end{multicols}
@@ -172,12 +189,13 @@ def distanceTo(source: Boolean): Double {
      mux (source) {
         0.0
      }{
-        foldhood(Double.PositiveInfinity)(Math.min(_,_)){ 
+        foldhood(Double.PositiveInfinity)(Math.min){ 
           nbr{distance} /*: Double */  + nbrRange /*: Double */
         } /*: Double */
     }
   }
 }
+override def main() = distanceTo(temperature() > 10)
 \end{lstlisting}
 \end{block}
 \end{frame}
@@ -194,6 +212,10 @@ New aggregate programming framework for Kotlin.
 \item Field calculus semantics
 \end{itemize}
 \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{\Kotac}
 \begin{block}{Operators API}
 \begin{lstlisting}[language={kotac}]
 interface AggregateContext {
@@ -204,10 +226,6 @@ interface AggregateContext {
 }
 \end{lstlisting}
 \end{block}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{\Kotac}
 \begin{block}{Example}
 \begin{lstlisting}[language={kotac}]
 fun AggregateContext.distanceTo(source: Boolean): Double =
@@ -217,21 +235,13 @@ fun AggregateContext.distanceTo(source: Boolean): Double =
         nbrRange /* Field<Double> */).min() /*: Double */
     )
   }
+fun AggregateContext.main(): Double = distanceTo(temperature() > 10)
 \end{lstlisting}
 \end{block}
 \end{frame}
 
 \begin{frame}
-\frametitle{\FKotac}
-\begin{block}{\FKotac}
-Subset of the \Kotac{} DSL used in order to formalize syntax, semantics and typing.
-
-Both aggregate function and Kotlin function have been formalized.
-\end{block}
-\end{frame}
-
-\begin{frame}
-\frametitle{\FKotac}
+\frametitle{\FKotac{} (Featherweight \Kotac{})}
 \begin{block}{Syntax}
 \centering
 \centerline{\scalebox{0.85}{$
@@ -256,17 +266,17 @@ Both aggregate function and Kotlin function have been formalized.
         \hline \\[-6pt]
         \AFUNCTION & \BNFcce &  \funK \; \afname (\overline{\xname}) \; \{ \alignK{\{\aexp\}} \}
                                                                                                                                                                                                         &   {\footnotesize \mbox{aggregate function declaration}} \\[3pt]
-        \aexp & \BNFcce & \xname \, \BNFmid \, \anyvalue  \BNFmid \; (\overline{\xname}) \; \toSym{\name}{\{\alignK\{\aexp\}\}} \, \BNFmid \, \aexp(\overline{\aexp}) \, \BNFmid \,  &   {\footnotesize \mbox{aggregate expression}} \\
+        \aexp & \BNFcce & \xname \, \BNFmid \, \anyvalue  \BNFmid \; (\overline{\xname}) \; \toSym{\color{red}{\name}}{\{\alignK\{\aexp\}\}} \, \BNFmid \, \aexp(\overline{\aexp}) \, \BNFmid \,  &   {\footnotesize \mbox{aggregate expression}} \\
         && \repK(\aexp)\{ (\xname) \ftoSym \aexp \} \, \BNFmid \, \nbrK\{\aexp\} \, \BNFmid \, \shareK(\aexp)\{(\xname) \ftoSym \aexp \} \\[3pt]
-                \anyvalue & \BNFcce &  \lvalue \; \BNFmid \; \funvalue \; \BNFmid \; \fvalue
+                \anyvalue & \BNFcce &  \lvalue \; \BNFmid \; \funvalue \; \BNFmid \; {\color{red} \fvalue}
                 &{ \mbox{\footnotesize value}}
                 \\[3pt]
               \funvalue & \BNFcce &  \sfunvalue \; \BNFmid \; \afunvalue
                 &{ \mbox{\footnotesize function value}}
                 \\[3pt]
-                \fvalue & \BNFcce &  \envmap{\overline\deviceId}{\overline\lvalue}
+                {\color{red} \fvalue} & \BNFcce &  {\color{red} \envmap{\overline\deviceId}{\overline\lvalue}}
                 &{ \mbox{\footnotesize neighbouring field value}} \\
-        \afunvalue & \BNFcce & \abname \; \BNFmid \; \afname \; \BNFmid \; (\overline{\xname}) \; \toSym{\name}{\{\alignK\{\aexp\}\}}
+        \afunvalue & \BNFcce & \abname \; \BNFmid \; \afname \; \BNFmid \; (\overline{\xname}) \; \toSym{\color{red}{\name}}{\{\alignK\{\aexp\}\}}
                                                                                                                                                                                                         &   {\footnotesize\mbox{aggregate function value}} \\
 \end{array}
         $}
@@ -671,6 +681,46 @@ Both aggregate function and Kotlin function have been formalized.
 \end{array}
 \end{array}$}
 \end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{Future works}
+\begin{block}{Contributions}
+\begin{itemize}
+\item \Kotac{} API definition and partial implementation
+\item \FKotac{} syntax, semantics and typing
+\end{itemize}
+\end{block}
+\begin{block}{Future works}
+\begin{itemize}
+\item Complete formalization with proof of properties
+\item Complete implementation of \Kotac{}
+\item Validation on industrial applications
+\end{itemize}
+\end{block}
+\end{frame}
+
+
+\begin{frame}
+\centering
+\Huge Thanks
+\end{frame}
+
+\begin{frame}
+\frametitle{Bibliography}
+J. Beal, D. Pianini and M. Viroli, "Aggregate Programming for the Internet of Things," in \textit{Computer}, vol. 48, no. 9, pp. 22-30, Sept. 2015, doi: 10.1109/MC.2015.261.
+
+\medskip
+
+M. Viroli, G. Audrito, F. Damiani, D. Pianini, and J. Beal. A higher-order calculus of computational fields. \textit{ACM Transactions on Computational Logic}, 20, 10 2016.
+
+\medskip
+
+Casadei, Roberto  (2020) Engineering Self-Adaptive Collective Processes for Cyber-Physical Ecosystems, [Dissertation thesis], Alma Mater Studiorum Università di Bologna.  Dottorato di ricerca in Computer science and engineering, 32 Ciclo. DOI 10.6092/unibo/amsdottorato/9380.
+
+\medskip
+
+Protelis: Practical Aggregate Programming, Danilo Pianini, Mirko Viroli, Jacob Beal, \textit{ACM Symposium on Applied Computing 2015}, April 2015.
 \end{frame}
 
 \end{document}
